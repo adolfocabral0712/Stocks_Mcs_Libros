@@ -47,10 +47,11 @@
     <section class="kpis" aria-label="Resumen de stock">
       <article class="kpi primary"><div class="kpi-label">Stock tradicional</div><div class="kpi-value"><span id="traditional">—</span><span class="kpi-unit">MCS</span></div></article>
       <article class="kpi"><div class="kpi-label">Stock BDMT planta</div><div class="kpi-value"><span id="bdmtStock">—</span><span class="kpi-unit">BDMT</span></div></article>
-      <article class="kpi"><div class="kpi-label">Stock troncos para chipear</div><div class="kpi-value"><span id="logsToChip">—</span><span class="kpi-unit">MCS</span></div></article>
+      <article class="kpi primary"><div class="kpi-label">Stock troncos para chipear</div><div class="kpi-value"><span id="logsToChip">—</span><span class="kpi-unit">MCS</span></div></article>
     </section>
     <section class="grid">
-      <article class="panel"><div class="panel-head"><h2>Detalle de existencias</h2><span class="count" id="rowCount">0 registros</span></div><div class="table-wrap"><table><thead><tr><th data-sort="company">Empresa</th><th data-sort="deposit">Depósito</th><th data-sort="product">Producto</th><th data-sort="certification">Certificación</th><th data-sort="mcs" class="num">MCS</th></tr></thead><tbody id="tbody"></tbody></table></div></article>
+      <article class="panel"><div class="panel-head"><h2>Detalle de existencias de MCS</h2><span class="count" id="rowCount">0 registros</span></div><div class="table-wrap"><table><thead><tr><th data-sort="company">Empresa</th><th data-sort="deposit">Depósito</th><th data-sort="product">Producto</th><th data-sort="certification">Certificación</th><th data-sort="mcs" class="num">MCS</th></tr></thead><tbody id="tbody"></tbody></table></div></article>
+      <article class="panel"><div class="panel-head"><h2>Detalle de existencias de BDMT</h2><span class="count" id="bdmtRowCount">0 registros</span></div><div class="table-wrap"><table><thead><tr><th>Cliente</th><th class="num">Acumulado BDMT</th></tr></thead><tbody id="bdmtTbody"></tbody></table></div></article>
     </section>
     <footer><span class="status"><span class="dot"></span>Datos tomados de Stock BDMT y Troncos</span></footer>
   </main>
@@ -74,7 +75,7 @@
       mcs:['acumulado_metros_cubicos','mcs','stock_mcs','metros_cubicos','metros_cúbicos','metroscubicos','cantidad_mcs','total_mcs','acumulado_mcs'],
       updated:['actualizado','ultima_actualizacion','última_actualización','fecha_actualizacion']
     };
-    const state={rows:[],filtered:[],bdmt:0,sortKey:'company',sortDir:1,collapsed:new Set()};
+    const state={rows:[],filtered:[],bdmt:0,bdmtClients:[],sortKey:'company',sortDir:1,collapsed:new Set()};
     const $=id=>document.getElementById(id);
     const cleanKey=s=>String(s??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'');
     const value=(row,names)=>{const map=Object.fromEntries(Object.keys(row).map(k=>[cleanKey(k),row[k]]));for(const n of names){const v=map[cleanKey(n)];if(v!==undefined&&v!==null&&v!=='')return v}return ''};
@@ -86,7 +87,7 @@
     const fmt=new Intl.NumberFormat('es-UY',{minimumFractionDigits:2,maximumFractionDigits:2});
     const esc=s=>String(s).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
     function fillSelect(id,values){const el=$(id),current=el.value;el.innerHTML='<option value="">'+(id==='company'?'Todas':'Todos')+'</option>'+[...new Set(values)].filter(Boolean).sort((a,b)=>a.localeCompare(b,'es')).map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join('');el.value=current}
-    function configure(rows,bdmt=0){state.bdmt=number(bdmt);state.rows=rows.map(normalize).filter(r=>r.mcs!==0);fillSelect('deposit',state.rows.map(r=>r.deposit));fillSelect('type',state.rows.map(r=>r.type));fillSelect('company',state.rows.map(r=>r.company));if([...$('deposit').options].some(o=>o.value==='FRIMOSA'))$('deposit').value='FRIMOSA';if([...$('type').options].some(o=>o.value==='TRADICIONAL'))$('type').value='TRADICIONAL';if([...$('company').options].some(o=>o.value==='FAS'))$('company').value='FAS';applyFilters()}
+    function configure(rows,stockBdmt={}){state.bdmt=number(stockBdmt.total_general_bdmt);state.bdmtClients=Array.isArray(stockBdmt.clientes)?stockBdmt.clientes.map(item=>({client:text(value(item,['client','cliente']))||'SIN CLIENTE',bdmt:number(value(item,['acumulado_bdmt','bdmt','total_bdmt']))})).filter(item=>item.bdmt!==0):[];state.rows=rows.map(normalize).filter(r=>r.mcs!==0);fillSelect('deposit',state.rows.map(r=>r.deposit));fillSelect('type',state.rows.map(r=>r.type));fillSelect('company',state.rows.map(r=>r.company));if([...$('deposit').options].some(o=>o.value==='FRIMOSA'))$('deposit').value='FRIMOSA';if([...$('type').options].some(o=>o.value==='TRADICIONAL'))$('type').value='TRADICIONAL';if([...$('company').options].some(o=>o.value==='FAS'))$('company').value='FAS';applyFilters()}
     function applyFilters(){const q=cleanKey($('search').value),dep=$('deposit').value,type=$('type').value,company=$('company').value;state.filtered=state.rows.filter(r=>(!q||cleanKey(`${r.deposit} ${r.product} ${r.certification} ${r.type} ${r.company} ${r.companyRaw}`).includes(q))&&(!dep||r.deposit===dep)&&(!type||r.type===type)&&(!company||r.company===company));render()}
     function render(){
       const rows=[...state.filtered].sort((a,b)=>{
@@ -112,8 +113,11 @@
         state.collapsed.has(company)?state.collapsed.delete(company):state.collapsed.add(company);
         render();
       }));
+      const bdmtRows=[...state.bdmtClients].sort((a,b)=>a.client.localeCompare(b.client,'es'));
+      $('bdmtRowCount').textContent=`${bdmtRows.length} registro${bdmtRows.length===1?'':'s'}`;
+      $('bdmtTbody').innerHTML=bdmtRows.length?bdmtRows.map(item=>`<tr><td>${esc(item.client)}</td><td class="num">${fmt.format(item.bdmt)}</td></tr>`).join(''):'<tr><td colspan="2" class="empty">No hay existencias de BDMT para mostrar.</td></tr>';
     }
-    async function load(){const demo=new URLSearchParams(location.search).has('demo');if(demo){$('notice').textContent='VISTA PREVIA · Datos demostrativos. El sitio publicado leerá el JSON real.';$('notice').classList.add('show');$('updated').textContent='Vista demostrativa';configure(DEMO,1250);return}try{const res=await fetch(`${JSON_URL}&_=${Date.now()}`,{cache:'no-store'});if(!res.ok)throw new Error(`HTTP ${res.status}`);const data=await res.json();const rows=extractRows(data);if(!rows.length)throw new Error('El JSON no contiene registros');const u=!Array.isArray(data)&&value(data,aliases.updated);const bdmt=!Array.isArray(data)&&data.stock_bdmt?data.stock_bdmt.total_general_bdmt:0;$('updated').textContent=u?text(u):new Date().toLocaleString('es-UY',{dateStyle:'short',timeStyle:'short'});configure(rows,bdmt)}catch(err){$('updated').textContent='Sin conexión';$('notice').innerHTML='No se pudo leer el archivo de datos. Verificá que el enlace de Dropbox siga público y permita acceso desde GitHub Pages.';$('notice').classList.add('show');configure([],0);console.error(err)}}
+    async function load(){const demo=new URLSearchParams(location.search).has('demo');if(demo){$('notice').textContent='VISTA PREVIA · Datos demostrativos. El sitio publicado leerá el JSON real.';$('notice').classList.add('show');$('updated').textContent='Vista demostrativa';configure(DEMO,{total_general_bdmt:22391.582,clientes:[{client:'PORTUGAL GS',acumulado_bdmt:22391.603}]});return}try{const res=await fetch(`${JSON_URL}&_=${Date.now()}`,{cache:'no-store'});if(!res.ok)throw new Error(`HTTP ${res.status}`);const data=await res.json();const rows=extractRows(data);if(!rows.length)throw new Error('El JSON no contiene registros');const u=!Array.isArray(data)&&value(data,aliases.updated);const stockBdmt=!Array.isArray(data)&&data.stock_bdmt?data.stock_bdmt:{};$('updated').textContent=u?text(u):new Date().toLocaleString('es-UY',{dateStyle:'short',timeStyle:'short'});configure(rows,stockBdmt)}catch(err){$('updated').textContent='Sin conexión';$('notice').innerHTML='No se pudo leer el archivo de datos. Verificá que el enlace de Dropbox siga público y permita acceso desde GitHub Pages.';$('notice').classList.add('show');configure([],{});console.error(err)}}
     ['search','deposit','type','company'].forEach(id=>$(id).addEventListener(id==='search'?'input':'change',applyFilters));$('clear').addEventListener('click',()=>{$('search').value='';$('deposit').value='';$('type').value='';$('company').value='';applyFilters()});document.querySelectorAll('th[data-sort]').forEach(th=>th.addEventListener('click',()=>{const key=th.dataset.sort;if(state.sortKey===key)state.sortDir*=-1;else{state.sortKey=key;state.sortDir=key==='mcs'?-1:1}render()}));load();
   </script>
 </body>
