@@ -6,119 +6,1319 @@
   <meta name="theme-color" content="#153f2e">
   <meta name="description" content="Consulta operativa de Stock BDMT y Troncos por depósito, empresa y producto.">
   <title>Stock BDMT y Troncos</title>
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23153f2e'/%3E%3Cpath d='M16 17h32v8H16zm3 13h26v7H19zm4 12h18v7H23z' fill='%23b8dc69'/%3E%3C/svg%3E">
+
+  <link
+    rel="icon"
+    type="image/svg+xml"
+    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23153f2e'/%3E%3Cpath d='M16 17h32v8H16zm3 13h26v7H19zm4 12h18v7H23z' fill='%23b8dc69'/%3E%3C/svg%3E"
+  >
+
   <style>
-    :root{--forest:#153f2e;--forest-2:#226046;--lime:#b8dc69;--lime-soft:#edf7d6;--bg:#eef3f0;--card:#fff;--text:#19241e;--muted:#69766f;--border:#d9e2dc;--danger:#b33a3a;--shadow:0 12px 30px rgba(21,63,46,.09)}
-    *{box-sizing:border-box}
-    html{scroll-behavior:smooth}
-    body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,Segoe UI,Roboto,Arial,sans-serif;font-size:16px}
-    button,input,select{font:inherit}
-    .topbar{background:var(--forest);color:#fff;padding:22px clamp(18px,4vw,54px);display:flex;align-items:center;justify-content:space-between;gap:20px;box-shadow:0 4px 20px rgba(8,30,20,.16)}
-    .brand{display:flex;align-items:center;gap:14px}.mark{width:45px;height:45px;border-radius:13px;background:var(--lime);display:grid;place-items:center;color:var(--forest);font-weight:900;letter-spacing:-1px}
-    h1{font-size:clamp(1.35rem,2vw,1.8rem);line-height:1.1;margin:0}.subtitle{color:#c8d8cf;margin-top:5px;font-size:.86rem}
-    .updated{border:1px solid rgba(255,255,255,.18);border-radius:12px;padding:9px 13px;text-align:right;font-size:.8rem;color:#d8e4dd;white-space:nowrap}.updated strong{display:block;color:#fff;font-size:.9rem;margin-top:2px}
-    main{max-width:1480px;margin:0 auto;padding:26px clamp(14px,3vw,36px) 46px}
-    .notice{display:none;margin-bottom:16px;padding:12px 15px;border:1px solid #ead28d;background:#fff9e7;color:#725714;border-radius:12px}.notice.show{display:block}
-    .filters{display:grid;grid-template-columns:minmax(220px,1.5fr) repeat(3,minmax(150px,1fr)) auto;gap:12px;background:var(--card);padding:15px;border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);margin-bottom:18px}
-    .field{display:flex;flex-direction:column;gap:6px}.field label{font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:800;text-align:center}.field input,.field select{height:43px;border:1px solid var(--border);border-radius:10px;background:#fbfcfb;color:var(--text);padding:0 12px;outline:none;min-width:0;text-align:center;text-align-last:center}.field input::placeholder{text-align:center}.field input:focus,.field select:focus{border-color:var(--forest-2);box-shadow:0 0 0 3px rgba(34,96,70,.12)}
-    .clear{align-self:end;height:43px;border:0;border-radius:10px;background:#e7eee9;color:var(--forest);font-weight:800;padding:0 17px;cursor:pointer}.clear:hover{background:#dce8e0}
-    .kpis{display:grid;grid-template-columns:repeat(3,minmax(240px,1fr));gap:14px;margin-bottom:18px}.kpi{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px;position:relative;overflow:hidden;box-shadow:var(--shadow);text-align:center}.kpi.primary{background:var(--forest);color:#fff;border-color:var(--forest)}.kpi.primary:after{content:"";position:absolute;width:105px;height:105px;border:24px solid rgba(184,220,105,.13);border-radius:50%;right:-35px;top:-45px}.kpi-label{font-size:.77rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:800;text-align:center}.primary .kpi-label{color:#c9d9cf}.kpi-value{font-size:clamp(1.6rem,3vw,2.35rem);font-weight:850;letter-spacing:-.04em;margin-top:7px;text-align:center}.kpi-unit{font-size:.8rem;color:var(--muted);font-weight:700;margin-left:4px}.primary .kpi-unit{color:var(--lime)}
-    .grid{display:grid;grid-template-columns:1fr;gap:18px}.panel{background:var(--card);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}.panel-head{padding:17px 19px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:center;gap:12px;position:relative}.panel-head h2{font-size:1rem;margin:0;text-align:center}.count{font-size:.78rem;color:var(--muted);background:#eef3f0;border-radius:999px;padding:5px 9px;position:absolute;right:19px}.table-wrap{overflow:auto;max-height:590px}table{width:100%;border-collapse:separate;border-spacing:0;white-space:nowrap}th{position:sticky;top:0;z-index:1;background:#f4f7f5;color:#4d5d54;text-align:center;font-size:.73rem;text-transform:uppercase;letter-spacing:.045em;padding:12px 14px;border-bottom:1px solid var(--border);cursor:pointer}td{padding:12px 14px;border-bottom:1px solid #edf1ee;font-size:.87rem;text-align:center}tbody tr:hover{background:#f7faf8}.num{text-align:center;font-variant-numeric:tabular-nums;font-weight:800}.empty{padding:45px 20px;text-align:center;color:var(--muted)}.status{display:inline-flex;align-items:center;gap:7px}.dot{width:8px;height:8px;border-radius:50%;background:var(--lime)}
-    .company-row td{background:#eaf1ec;border-bottom-color:#d4e0d8;font-weight:850}.company-toggle{display:flex;align-items:center;justify-content:center;gap:9px;border:0;background:transparent;color:var(--forest);font-weight:850;padding:0;width:100%;cursor:pointer}.company-toggle .chevron{display:inline-block;width:20px;height:20px;border-radius:6px;background:var(--forest);color:#fff;line-height:20px;text-align:center;font-size:.7rem}.company-total{color:var(--forest);font-weight:900}.child-company{color:#8a9690;text-align:center}.loading{min-height:280px;display:grid;place-items:center;color:var(--muted)}.spinner{width:30px;height:30px;border:3px solid #dce5df;border-top-color:var(--forest);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 10px}@keyframes spin{to{transform:rotate(360deg)}}
-    footer{text-align:center;color:var(--muted);font-size:.78rem;margin-top:22px}
-    @media(max-width:1000px){.filters{grid-template-columns:1fr 1fr}.clear{width:100%}.kpis{grid-template-columns:1fr 1fr}.grid{grid-template-columns:1fr}}
-    @media(max-width:620px){.topbar{padding:17px}.subtitle{display:none}.updated{display:none}main{padding:15px 10px 32px}.filters{grid-template-columns:1fr;padding:12px}.kpis{grid-template-columns:1fr 1fr;gap:10px}.kpi{padding:14px}.kpi.primary{grid-column:1/-1}.kpi-value{font-size:1.55rem}.panel-head{padding:14px}.deposit-list{max-height:none}.table-wrap{max-height:520px}th,td{padding:11px 12px}}
+    :root {
+      --forest: #153f2e;
+      --forest-2: #226046;
+      --lime: #b8dc69;
+      --lime-soft: #edf7d6;
+      --bg: #eef3f0;
+      --card: #ffffff;
+      --text: #19241e;
+      --muted: #69766f;
+      --border: #d9e2dc;
+      --danger: #b33a3a;
+      --shadow: 0 12px 30px rgba(21, 63, 46, .09);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, Segoe UI, Roboto, Arial, sans-serif;
+      font-size: 16px;
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    .topbar {
+      background: var(--forest);
+      color: #ffffff;
+      padding: 22px clamp(18px, 4vw, 54px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      box-shadow: 0 4px 20px rgba(8, 30, 20, .16);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .mark {
+      width: 45px;
+      height: 45px;
+      border-radius: 13px;
+      background: var(--lime);
+      display: grid;
+      place-items: center;
+      color: var(--forest);
+      font-weight: 900;
+      letter-spacing: -1px;
+    }
+
+    h1 {
+      font-size: clamp(1.35rem, 2vw, 1.8rem);
+      line-height: 1.1;
+      margin: 0;
+    }
+
+    .subtitle {
+      color: #c8d8cf;
+      margin-top: 5px;
+      font-size: .86rem;
+    }
+
+    .updated {
+      border: 1px solid rgba(255, 255, 255, .18);
+      border-radius: 12px;
+      padding: 9px 13px;
+      text-align: right;
+      font-size: .8rem;
+      color: #d8e4dd;
+      white-space: nowrap;
+    }
+
+    .updated strong {
+      display: block;
+      color: #ffffff;
+      font-size: .9rem;
+      margin-top: 2px;
+    }
+
+    main {
+      max-width: 1480px;
+      margin: 0 auto;
+      padding: 26px clamp(14px, 3vw, 36px) 46px;
+    }
+
+    .notice {
+      display: none;
+      margin-bottom: 16px;
+      padding: 12px 15px;
+      border: 1px solid #ead28d;
+      background: #fff9e7;
+      color: #725714;
+      border-radius: 12px;
+    }
+
+    .notice.show {
+      display: block;
+    }
+
+    .filters {
+      display: grid;
+      grid-template-columns:
+        minmax(220px, 1.5fr)
+        repeat(3, minmax(150px, 1fr))
+        auto;
+      gap: 12px;
+      background: var(--card);
+      padding: 15px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      margin-bottom: 18px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .field label {
+      font-size: .75rem;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--muted);
+      font-weight: 800;
+      text-align: center;
+    }
+
+    .field input,
+    .field select {
+      height: 43px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: #fbfcfb;
+      color: var(--text);
+      padding: 0 12px;
+      outline: none;
+      min-width: 0;
+      text-align: center;
+      text-align-last: center;
+    }
+
+    .field input::placeholder {
+      text-align: center;
+    }
+
+    .field input:focus,
+    .field select:focus {
+      border-color: var(--forest-2);
+      box-shadow: 0 0 0 3px rgba(34, 96, 70, .12);
+    }
+
+    .clear {
+      align-self: end;
+      height: 43px;
+      border: 0;
+      border-radius: 10px;
+      background: #e7eee9;
+      color: var(--forest);
+      font-weight: 800;
+      padding: 0 17px;
+      cursor: pointer;
+    }
+
+    .clear:hover {
+      background: #dce8e0;
+    }
+
+    .kpis {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(240px, 1fr));
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .kpi {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      text-align: center;
+    }
+
+    .kpi.primary {
+      background: var(--forest);
+      color: #ffffff;
+      border-color: var(--forest);
+    }
+
+    .kpi.primary::after {
+      content: "";
+      position: absolute;
+      width: 105px;
+      height: 105px;
+      border: 24px solid rgba(184, 220, 105, .13);
+      border-radius: 50%;
+      right: -35px;
+      top: -45px;
+    }
+
+    .kpi-label {
+      font-size: .77rem;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      color: var(--muted);
+      font-weight: 800;
+      text-align: center;
+    }
+
+    .primary .kpi-label {
+      color: #c9d9cf;
+    }
+
+    .kpi-value {
+      font-size: clamp(1.6rem, 3vw, 2.35rem);
+      font-weight: 850;
+      letter-spacing: -.04em;
+      margin-top: 7px;
+      text-align: center;
+    }
+
+    .kpi-unit {
+      font-size: .8rem;
+      color: var(--muted);
+      font-weight: 700;
+      margin-left: 4px;
+    }
+
+    .primary .kpi-unit {
+      color: var(--lime);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 18px;
+    }
+
+    .panel {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .panel-head {
+      padding: 17px 19px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      position: relative;
+    }
+
+    .panel-head h2 {
+      font-size: 1rem;
+      margin: 0;
+      text-align: center;
+    }
+
+    .count {
+      font-size: .78rem;
+      color: var(--muted);
+      background: #eef3f0;
+      border-radius: 999px;
+      padding: 5px 9px;
+      position: absolute;
+      right: 19px;
+    }
+
+    .table-wrap {
+      overflow: auto;
+      max-height: 590px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      white-space: nowrap;
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      background: #f4f7f5;
+      color: #4d5d54;
+      text-align: center;
+      font-size: .73rem;
+      text-transform: uppercase;
+      letter-spacing: .045em;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+    }
+
+    td {
+      padding: 12px 14px;
+      border-bottom: 1px solid #edf1ee;
+      font-size: .87rem;
+      text-align: center;
+    }
+
+    tbody tr:hover {
+      background: #f7faf8;
+    }
+
+    .num {
+      text-align: center;
+      font-variant-numeric: tabular-nums;
+      font-weight: 800;
+    }
+
+    .empty {
+      padding: 45px 20px;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--lime);
+    }
+
+    .company-row td {
+      background: #eaf1ec;
+      border-bottom-color: #d4e0d8;
+      font-weight: 850;
+    }
+
+    .company-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      border: 0;
+      background: transparent;
+      color: var(--forest);
+      font-weight: 850;
+      padding: 0;
+      width: 100%;
+      cursor: pointer;
+    }
+
+    .company-toggle .chevron {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border-radius: 6px;
+      background: var(--forest);
+      color: #ffffff;
+      line-height: 20px;
+      text-align: center;
+      font-size: .7rem;
+    }
+
+    .company-total {
+      color: var(--forest);
+      font-weight: 900;
+    }
+
+    .child-company {
+      color: #8a9690;
+      text-align: center;
+    }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: .78rem;
+      margin-top: 22px;
+    }
+
+    @media (max-width: 1000px) {
+      .filters {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .clear {
+        width: 100%;
+      }
+
+      .kpis {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 620px) {
+      .topbar {
+        padding: 17px;
+      }
+
+      .subtitle,
+      .updated {
+        display: none;
+      }
+
+      main {
+        padding: 15px 10px 32px;
+      }
+
+      .filters {
+        grid-template-columns: 1fr;
+        padding: 12px;
+      }
+
+      .kpis {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+
+      .kpi {
+        padding: 14px;
+      }
+
+      .kpi-value {
+        font-size: 1.55rem;
+      }
+
+      .panel-head {
+        padding: 14px;
+      }
+
+      .count {
+        position: static;
+      }
+
+      .table-wrap {
+        max-height: 520px;
+      }
+
+      th,
+      td {
+        padding: 11px 12px;
+      }
+    }
   </style>
 </head>
+
 <body>
   <header class="topbar">
-    <div class="brand"><div class="mark">M³</div><div><h1>Stock BDMT y Troncos</h1><div class="subtitle">Existencias consolidadas por depósito y producto</div></div></div>
-    <div class="updated">ÚLTIMA ACTUALIZACIÓN<strong id="updated">Consultando…</strong></div>
+    <div class="brand">
+      <div class="mark">M³</div>
+
+      <div>
+        <h1>Stock BDMT y Troncos</h1>
+        <div class="subtitle">
+          Existencias consolidadas por depósito y producto
+        </div>
+      </div>
+    </div>
+
+    <div class="updated">
+      ÚLTIMA ACTUALIZACIÓN
+      <strong id="updated">Consultando…</strong>
+    </div>
   </header>
+
   <main>
     <div id="notice" class="notice"></div>
+
     <section class="filters" aria-label="Filtros del stock">
-      <div class="field"><label for="search">Buscar</label><input id="search" type="search" placeholder="Producto, empresa o depósito…"></div>
-      <div class="field"><label for="deposit">Depósito</label><select id="deposit"><option value="">Todos</option></select></div>
-      <div class="field"><label for="type">Tipo de producto</label><select id="type"><option value="">Todos</option></select></div>
-      <div class="field"><label for="company">Empresa</label><select id="company"><option value="">Todas</option></select></div>
-      <button class="clear" id="clear" type="button">Limpiar filtros</button>
+      <div class="field">
+        <label for="search">Buscar</label>
+        <input
+          id="search"
+          type="search"
+          placeholder="Producto, empresa o depósito…"
+        >
+      </div>
+
+      <div class="field">
+        <label for="deposit">Depósito</label>
+        <select id="deposit">
+          <option value="">Todos</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="type">Tipo de producto</label>
+        <select id="type">
+          <option value="">Todos</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="company">Empresa</label>
+        <select id="company">
+          <option value="">Todas</option>
+        </select>
+      </div>
+
+      <button class="clear" id="clear" type="button">
+        Limpiar filtros
+      </button>
     </section>
+
     <section class="kpis" aria-label="Resumen de stock">
-      <article class="kpi primary"><div class="kpi-label">Stock tradicional</div><div class="kpi-value"><span id="traditional">—</span><span class="kpi-unit">MCS</span></div></article>
-      <article class="kpi"><div class="kpi-label">Stock BDMT planta</div><div class="kpi-value"><span id="bdmtStock">—</span><span class="kpi-unit">BDMT</span></div></article>
-      <article class="kpi primary"><div class="kpi-label">Stock troncos para chipear</div><div class="kpi-value"><span id="logsToChip">—</span><span class="kpi-unit">MCS</span></div></article>
+      <article class="kpi primary">
+        <div class="kpi-label">Stock tradicional</div>
+
+        <div class="kpi-value">
+          <span id="traditional">—</span>
+          <span class="kpi-unit">MCS</span>
+        </div>
+      </article>
+
+      <article class="kpi">
+        <div class="kpi-label">Stock BDMT planta</div>
+
+        <div class="kpi-value">
+          <span id="bdmtStock">—</span>
+          <span class="kpi-unit">BDMT</span>
+        </div>
+      </article>
+
+      <article class="kpi primary">
+        <div class="kpi-label">Stock troncos para chipear</div>
+
+        <div class="kpi-value">
+          <span id="logsToChip">—</span>
+          <span class="kpi-unit">MCS</span>
+        </div>
+      </article>
     </section>
+
     <section class="grid">
-      <article class="panel"><div class="panel-head"><h2>Detalle de existencias de MCS</h2><span class="count" id="rowCount">0 registros</span></div><div class="table-wrap"><table><thead><tr><th data-sort="company">Empresa</th><th data-sort="deposit">Depósito</th><th data-sort="product">Producto</th><th data-sort="certification">Certificación</th><th data-sort="mcs" class="num">MCS</th></tr></thead><tbody id="tbody"></tbody></table></div></article>
-      <article class="panel"><div class="panel-head"><h2>Detalle de existencias de BDMT</h2><span class="count" id="bdmtRowCount">0 registros</span></div><div class="table-wrap"><table><thead><tr><th>Cliente</th><th class="num">Acumulado BDMT</th></tr></thead><tbody id="bdmtTbody"></tbody></table></div></article>
+      <article class="panel">
+        <div class="panel-head">
+          <h2>Detalle de existencias de MCS</h2>
+          <span class="count" id="rowCount">0 registros</span>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th data-sort="company">Empresa</th>
+                <th data-sort="deposit">Depósito</th>
+                <th data-sort="product">Producto</th>
+                <th data-sort="certification">Certificación</th>
+                <th data-sort="mcs" class="num">MCS</th>
+              </tr>
+            </thead>
+
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="panel">
+        <div class="panel-head">
+          <h2>Detalle de existencias de BDMT</h2>
+          <span class="count" id="bdmtRowCount">0 registros</span>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Cliente</th>
+                <th class="num">Acumulado BDMT</th>
+              </tr>
+            </thead>
+
+            <tbody id="bdmtTbody"></tbody>
+          </table>
+        </div>
+      </article>
     </section>
-    <footer><span class="status"><span class="dot"></span>Datos tomados de Stock BDMT y Troncos</span></footer>
+
+    <footer>
+      <span class="status">
+        <span class="dot"></span>
+        Datos tomados de Stock BDMT y Troncos
+      </span>
+    </footer>
   </main>
+
   <script>
-    const JSON_URL='https://dl.dropbox.com/scl/fi/8zqq5szdh57gtbedb8nfz/Stock-Mcs-Libros.json?rlkey=2aknnkdm9jjihs3ij6x2a40b0&dl=1';
-    const DEMO=[
-      {deposito:'FRIMOSA',producto:'Bicostata 7,20',certificacion:'FSC Mixto',tipo:'TRADICIONAL',empresa:'FORESTAL ATLANTICO SUR',mcs:1284.72},
-      {deposito:'FRIMOSA',producto:'Globulus 7,20',certificacion:'Controlado FSC',tipo:'TRADICIONAL',empresa:'FORESTAL ATLANTICO SUR',mcs:953.40},
-      {deposito:'FRIMOSA',producto:'Colorado 7,20',certificacion:'Controlado FSC',tipo:'NO TRADICIONAL',empresa:'FORESUR',mcs:846.35},
-      {deposito:'PLANTA FAS',producto:'Dunii 2,40',certificacion:'FSC Mixto',tipo:'TRADICIONAL',empresa:'GRUPO FORESTAL',mcs:642.18},
-      {deposito:'UPM PASO DE LOS TOROS',producto:'Globulus 3,00',certificacion:'Controlado FSC',tipo:'NO TRADICIONAL',empresa:'FORESUR',mcs:1097.44},
-      {deposito:'POLO LOGÍSTICO MCS',producto:'Columnas 7,80',certificacion:'FSC Mixto',tipo:'NO TRADICIONAL',empresa:'GRUPO FORESTAL',mcs:518.90},
-      {deposito:'PLANTA FAS',producto:'Bicostata 2,40',certificacion:'Controlado FSC',tipo:'TRADICIONAL',empresa:'FORESUR',mcs:377.26}
+    const JSON_URL = "/api/stock";
+
+    const DEMO = [
+      {
+        deposito: "FRIMOSA",
+        producto: "Bicostata 7,20",
+        certificacion: "FSC Mixto",
+        tipo: "TRADICIONAL",
+        empresa: "FORESTAL ATLANTICO SUR",
+        mcs: 1284.72
+      },
+      {
+        deposito: "FRIMOSA",
+        producto: "Globulus 7,20",
+        certificacion: "Controlado FSC",
+        tipo: "TRADICIONAL",
+        empresa: "FORESTAL ATLANTICO SUR",
+        mcs: 953.40
+      },
+      {
+        deposito: "FRIMOSA",
+        producto: "Colorado 7,20",
+        certificacion: "Controlado FSC",
+        tipo: "NO TRADICIONAL",
+        empresa: "FORESUR",
+        mcs: 846.35
+      }
     ];
-    const aliases={
-      deposit:['deposito','depósito','nombre_deposito','nombredeposito'],
-      product:['producto','nombre_producto','nombreprod2','nombreprod','descripcion_producto'],
-      type:['tipo','tipo_producto','tipoproducto','clasificacion','clasificación','tradicional'],
-      company:['empresa','nombre_empresa','nombreempresa','razon_social','razón_social'],
-      certification:['certificacion','certificación','nombre_certificacion','nombre_certificación'],
-      mcs:['acumulado_metros_cubicos','mcs','stock_mcs','metros_cubicos','metros_cúbicos','metroscubicos','cantidad_mcs','total_mcs','acumulado_mcs'],
-      updated:['actualizado','ultima_actualizacion','última_actualización','fecha_actualizacion']
+
+    const aliases = {
+      deposit: [
+        "deposito",
+        "depósito",
+        "nombre_deposito",
+        "nombredeposito"
+      ],
+      product: [
+        "producto",
+        "nombre_producto",
+        "nombreprod2",
+        "nombreprod",
+        "descripcion_producto"
+      ],
+      type: [
+        "tipo",
+        "tipo_producto",
+        "tipoproducto",
+        "clasificacion",
+        "clasificación",
+        "tradicional"
+      ],
+      company: [
+        "empresa",
+        "nombre_empresa",
+        "nombreempresa",
+        "razon_social",
+        "razón_social"
+      ],
+      certification: [
+        "certificacion",
+        "certificación",
+        "nombre_certificacion",
+        "nombre_certificación"
+      ],
+      mcs: [
+        "acumulado_metros_cubicos",
+        "mcs",
+        "stock_mcs",
+        "metros_cubicos",
+        "metros_cúbicos",
+        "metroscubicos",
+        "cantidad_mcs",
+        "total_mcs",
+        "acumulado_mcs"
+      ],
+      updated: [
+        "actualizado",
+        "ultima_actualizacion",
+        "última_actualización",
+        "fecha_actualizacion"
+      ]
     };
-    const state={rows:[],filtered:[],bdmt:0,bdmtClients:[],sortKey:'company',sortDir:1,collapsed:new Set()};
-    const $=id=>document.getElementById(id);
-    const cleanKey=s=>String(s??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'');
-    const value=(row,names)=>{const map=Object.fromEntries(Object.keys(row).map(k=>[cleanKey(k),row[k]]));for(const n of names){const v=map[cleanKey(n)];if(v!==undefined&&v!==null&&v!=='')return v}return ''};
-    const number=v=>{if(typeof v==='number')return Number.isFinite(v)?v:0;let s=String(v??'').trim().replace(/\s/g,'');if(!s)return 0;if(s.includes(',')&&s.includes('.'))s=s.lastIndexOf(',')>s.lastIndexOf('.')?s.replace(/\./g,'').replace(',','.'):s.replace(/,/g,'');else if(s.includes(','))s=s.replace(',','.');return Number(s)||0};
-    const text=v=>String(v??'').trim();
-    const companyName=v=>cleanKey(v).includes('forestal_atlantico')?'FAS':text(v)||'SIN EMPRESA';
-    const normalize=row=>{const companyRaw=text(value(row,aliases.company));return{deposit:text(value(row,aliases.deposit))||'SIN DEPÓSITO',product:text(value(row,aliases.product))||'SIN PRODUCTO',certification:text(value(row,aliases.certification))||'SIN CERTIFICACIÓN',type:text(value(row,aliases.type)).toUpperCase()||'SIN CLASIFICAR',company:companyName(companyRaw),companyRaw,mcs:number(value(row,aliases.mcs)),raw:row}};
-    const extractRows=data=>{if(Array.isArray(data))return data;if(!data||typeof data!=='object')return[];for(const key of ['datos','data','registros','stock','resultados','items'])if(Array.isArray(data[key]))return data[key];return Object.values(data).find(Array.isArray)||[]};
-    const fmt=new Intl.NumberFormat('es-UY',{minimumFractionDigits:2,maximumFractionDigits:2});
-    const esc=s=>String(s).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
-    function fillSelect(id,values){const el=$(id),current=el.value;el.innerHTML='<option value="">'+(id==='company'?'Todas':'Todos')+'</option>'+[...new Set(values)].filter(Boolean).sort((a,b)=>a.localeCompare(b,'es')).map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join('');el.value=current}
-    function configure(rows,stockBdmt={}){state.bdmt=number(stockBdmt.total_general_bdmt);state.bdmtClients=Array.isArray(stockBdmt.clientes)?stockBdmt.clientes.map(item=>({client:text(value(item,['client','cliente']))||'SIN CLIENTE',bdmt:number(value(item,['acumulado_bdmt','bdmt','total_bdmt']))})).filter(item=>item.bdmt!==0):[];state.rows=rows.map(normalize).filter(r=>r.mcs!==0);fillSelect('deposit',state.rows.map(r=>r.deposit));fillSelect('type',state.rows.map(r=>r.type));fillSelect('company',state.rows.map(r=>r.company));if([...$('deposit').options].some(o=>o.value==='FRIMOSA'))$('deposit').value='FRIMOSA';if([...$('type').options].some(o=>o.value==='TRADICIONAL'))$('type').value='TRADICIONAL';if([...$('company').options].some(o=>o.value==='FAS'))$('company').value='FAS';applyFilters()}
-    function applyFilters(){const q=cleanKey($('search').value),dep=$('deposit').value,type=$('type').value,company=$('company').value;state.filtered=state.rows.filter(r=>(!q||cleanKey(`${r.deposit} ${r.product} ${r.certification} ${r.type} ${r.company} ${r.companyRaw}`).includes(q))&&(!dep||r.deposit===dep)&&(!type||r.type===type)&&(!company||r.company===company));render()}
-    function render(){
-      const rows=[...state.filtered].sort((a,b)=>{
-        const av=a[state.sortKey],bv=b[state.sortKey];
-        return(typeof av==='number'?av-bv:String(av).localeCompare(String(bv),'es'))*state.sortDir;
-      });
-      const isNon=t=>cleanKey(t).includes('no_tradicional');
-      const trad=rows.filter(r=>!isNon(r.type)&&cleanKey(r.type).includes('tradicional')).reduce((s,r)=>s+r.mcs,0);
-      $('traditional').textContent=fmt.format(trad);
-      $('bdmtStock').textContent=fmt.format(state.bdmt);
-      $('logsToChip').textContent=fmt.format(trad-(state.bdmt/0.58));
-      $('rowCount').textContent=`${rows.length} registro${rows.length===1?'':'s'}`;
-      const groups=new Map();
-      rows.forEach(r=>{if(!groups.has(r.company))groups.set(r.company,[]);groups.get(r.company).push(r)});
-      $('tbody').innerHTML=rows.length?[...groups.entries()].map(([company,items])=>{
-        const collapsed=state.collapsed.has(company),subtotal=items.reduce((s,r)=>s+r.mcs,0);
-        const head=`<tr class="company-row"><td><button type="button" class="company-toggle" data-company="${encodeURIComponent(company)}" aria-expanded="${!collapsed}"><span class="chevron">${collapsed?'▶':'▼'}</span>${esc(company)}</button></td><td colspan="3"></td><td class="num company-total">${fmt.format(subtotal)}</td></tr>`;
-        const detail=collapsed?'':items.map(r=>`<tr><td class="child-company">↳</td><td>${esc(r.deposit)}</td><td>${esc(r.product)}</td><td>${esc(r.certification)}</td><td class="num">${fmt.format(r.mcs)}</td></tr>`).join('');
-        return head+detail;
-      }).join(''):'<tr><td colspan="5" class="empty">No hay registros con MCS mayor o menor que cero.</td></tr>';
-      document.querySelectorAll('.company-toggle').forEach(btn=>btn.addEventListener('click',()=>{
-        const company=decodeURIComponent(btn.dataset.company);
-        state.collapsed.has(company)?state.collapsed.delete(company):state.collapsed.add(company);
-        render();
-      }));
-      const bdmtRows=[...state.bdmtClients].sort((a,b)=>a.client.localeCompare(b.client,'es'));
-      $('bdmtRowCount').textContent=`${bdmtRows.length} registro${bdmtRows.length===1?'':'s'}`;
-      $('bdmtTbody').innerHTML=bdmtRows.length?bdmtRows.map(item=>`<tr><td>${esc(item.client)}</td><td class="num">${fmt.format(item.bdmt)}</td></tr>`).join(''):'<tr><td colspan="2" class="empty">No hay existencias de BDMT para mostrar.</td></tr>';
+
+    const state = {
+      rows: [],
+      filtered: [],
+      bdmt: 0,
+      bdmtClients: [],
+      sortKey: "company",
+      sortDir: 1,
+      collapsed: new Set()
+    };
+
+    const $ = (id) => document.getElementById(id);
+
+    const cleanKey = (value) => {
+      return String(value ?? "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "_")
+        .replace(/^_|_$/g, "");
+    };
+
+    const value = (row, names) => {
+      const map = Object.fromEntries(
+        Object.keys(row).map((key) => [
+          cleanKey(key),
+          row[key]
+        ])
+      );
+
+      for (const name of names) {
+        const result = map[cleanKey(name)];
+
+        if (
+          result !== undefined &&
+          result !== null &&
+          result !== ""
+        ) {
+          return result;
+        }
+      }
+
+      return "";
+    };
+
+    const number = (value) => {
+      if (typeof value === "number") {
+        return Number.isFinite(value) ? value : 0;
+      }
+
+      let text = String(value ?? "")
+        .trim()
+        .replace(/\s/g, "");
+
+      if (!text) {
+        return 0;
+      }
+
+      if (text.includes(",") && text.includes(".")) {
+        text =
+          text.lastIndexOf(",") > text.lastIndexOf(".")
+            ? text.replace(/\./g, "").replace(",", ".")
+            : text.replace(/,/g, "");
+      } else if (text.includes(",")) {
+        text = text.replace(",", ".");
+      }
+
+      return Number(text) || 0;
+    };
+
+    const text = (value) => String(value ?? "").trim();
+
+    const companyName = (value) => {
+      return cleanKey(value).includes("forestal_atlantico")
+        ? "FAS"
+        : text(value) || "SIN EMPRESA";
+    };
+
+    const normalize = (row) => {
+      const companyRaw = text(
+        value(row, aliases.company)
+      );
+
+      return {
+        deposit:
+          text(value(row, aliases.deposit)) ||
+          "SIN DEPÓSITO",
+
+        product:
+          text(value(row, aliases.product)) ||
+          "SIN PRODUCTO",
+
+        certification:
+          text(value(row, aliases.certification)) ||
+          "SIN CERTIFICACIÓN",
+
+        type:
+          text(value(row, aliases.type)).toUpperCase() ||
+          "SIN CLASIFICAR",
+
+        company: companyName(companyRaw),
+        companyRaw,
+
+        mcs: number(
+          value(row, aliases.mcs)
+        ),
+
+        raw: row
+      };
+    };
+
+    const extractRows = (data) => {
+      if (Array.isArray(data)) {
+        return data;
+      }
+
+      if (!data || typeof data !== "object") {
+        return [];
+      }
+
+      for (
+        const key of [
+          "datos",
+          "data",
+          "registros",
+          "stock",
+          "resultados",
+          "items"
+        ]
+      ) {
+        if (Array.isArray(data[key])) {
+          return data[key];
+        }
+      }
+
+      return Object.values(data).find(Array.isArray) || [];
+    };
+
+    const fmt = new Intl.NumberFormat("es-UY", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+
+    const esc = (value) => {
+      return String(value).replace(
+        /[&<>'"]/g,
+        (character) => ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          "'": "&#39;",
+          "\"": "&quot;"
+        })[character]
+      );
+    };
+
+    function fillSelect(id, values) {
+      const element = $(id);
+      const current = element.value;
+
+      const firstOption =
+        id === "company"
+          ? "Todas"
+          : "Todos";
+
+      const options = [
+        ...new Set(values)
+      ]
+        .filter(Boolean)
+        .sort((a, b) => a.localeCompare(b, "es"))
+        .map((item) => {
+          return `
+            <option value="${esc(item)}">
+              ${esc(item)}
+            </option>
+          `;
+        })
+        .join("");
+
+      element.innerHTML = `
+        <option value="">${firstOption}</option>
+        ${options}
+      `;
+
+      element.value = current;
     }
-    async function load(){const demo=new URLSearchParams(location.search).has('demo');if(demo){$('notice').textContent='VISTA PREVIA · Datos demostrativos. El sitio publicado leerá el JSON real.';$('notice').classList.add('show');$('updated').textContent='Vista demostrativa';configure(DEMO,{total_general_bdmt:22391.582,clientes:[{client:'PORTUGAL GS',acumulado_bdmt:22391.603}]});return}try{const res=await fetch(`${JSON_URL}&_=${Date.now()}`,{cache:'no-store'});if(!res.ok)throw new Error(`HTTP ${res.status}`);const data=await res.json();const rows=extractRows(data);if(!rows.length)throw new Error('El JSON no contiene registros');const u=!Array.isArray(data)&&value(data,aliases.updated);const stockBdmt=!Array.isArray(data)&&data.stock_bdmt?data.stock_bdmt:{};$('updated').textContent=u?text(u):new Date().toLocaleString('es-UY',{dateStyle:'short',timeStyle:'short'});configure(rows,stockBdmt)}catch(err){$('updated').textContent='Sin conexión';$('notice').innerHTML='No se pudo leer el archivo de datos. Verificá que el enlace de Dropbox siga público y permita acceso desde GitHub Pages.';$('notice').classList.add('show');configure([],{});console.error(err)}}
-    ['search','deposit','type','company'].forEach(id=>$(id).addEventListener(id==='search'?'input':'change',applyFilters));$('clear').addEventListener('click',()=>{$('search').value='';$('deposit').value='';$('type').value='';$('company').value='';applyFilters()});document.querySelectorAll('th[data-sort]').forEach(th=>th.addEventListener('click',()=>{const key=th.dataset.sort;if(state.sortKey===key)state.sortDir*=-1;else{state.sortKey=key;state.sortDir=key==='mcs'?-1:1}render()}));load();
+
+    function configure(rows, stockBdmt = {}) {
+      state.bdmt = number(
+        stockBdmt.total_general_bdmt
+      );
+
+      state.bdmtClients =
+        Array.isArray(stockBdmt.clientes)
+          ? stockBdmt.clientes
+              .map((item) => ({
+                client:
+                  text(
+                    value(item, [
+                      "client",
+                      "cliente"
+                    ])
+                  ) || "SIN CLIENTE",
+
+                bdmt: number(
+                  value(item, [
+                    "acumulado_bdmt",
+                    "bdmt",
+                    "total_bdmt"
+                  ])
+                )
+              }))
+              .filter((item) => item.bdmt !== 0)
+          : [];
+
+      state.rows = rows
+        .map(normalize)
+        .filter((row) => row.mcs !== 0);
+
+      fillSelect(
+        "deposit",
+        state.rows.map((row) => row.deposit)
+      );
+
+      fillSelect(
+        "type",
+        state.rows.map((row) => row.type)
+      );
+
+      fillSelect(
+        "company",
+        state.rows.map((row) => row.company)
+      );
+
+      if (
+        [...$("deposit").options].some(
+          (option) => option.value === "FRIMOSA"
+        )
+      ) {
+        $("deposit").value = "FRIMOSA";
+      }
+
+      if (
+        [...$("type").options].some(
+          (option) => option.value === "TRADICIONAL"
+        )
+      ) {
+        $("type").value = "TRADICIONAL";
+      }
+
+      if (
+        [...$("company").options].some(
+          (option) => option.value === "FAS"
+        )
+      ) {
+        $("company").value = "FAS";
+      }
+
+      applyFilters();
+    }
+
+    function applyFilters() {
+      const search = cleanKey(
+        $("search").value
+      );
+
+      const deposit = $("deposit").value;
+      const type = $("type").value;
+      const company = $("company").value;
+
+      state.filtered = state.rows.filter((row) => {
+        const searchContent = cleanKey(`
+          ${row.deposit}
+          ${row.product}
+          ${row.certification}
+          ${row.type}
+          ${row.company}
+          ${row.companyRaw}
+        `);
+
+        return (
+          (!search || searchContent.includes(search)) &&
+          (!deposit || row.deposit === deposit) &&
+          (!type || row.type === type) &&
+          (!company || row.company === company)
+        );
+      });
+
+      render();
+    }
+
+    function render() {
+      const rows = [...state.filtered].sort(
+        (a, b) => {
+          const first = a[state.sortKey];
+          const second = b[state.sortKey];
+
+          const comparison =
+            typeof first === "number"
+              ? first - second
+              : String(first).localeCompare(
+                  String(second),
+                  "es"
+                );
+
+          return comparison * state.sortDir;
+        }
+      );
+
+      const isNonTraditional = (type) => {
+        return cleanKey(type).includes(
+          "no_tradicional"
+        );
+      };
+
+      const traditionalStock = rows
+        .filter((row) => {
+          return (
+            !isNonTraditional(row.type) &&
+            cleanKey(row.type).includes(
+              "tradicional"
+            )
+          );
+        })
+        .reduce(
+          (total, row) => total + row.mcs,
+          0
+        );
+
+      const logsToChip =
+        traditionalStock -
+        state.bdmt / 0.58;
+
+      $("traditional").textContent =
+        fmt.format(traditionalStock);
+
+      $("bdmtStock").textContent =
+        fmt.format(state.bdmt);
+
+      $("logsToChip").textContent =
+        fmt.format(logsToChip);
+
+      $("rowCount").textContent =
+        `${rows.length} registro${rows.length === 1 ? "" : "s"}`;
+
+      const groups = new Map();
+
+      rows.forEach((row) => {
+        if (!groups.has(row.company)) {
+          groups.set(row.company, []);
+        }
+
+        groups.get(row.company).push(row);
+      });
+
+      $("tbody").innerHTML = rows.length
+        ? [...groups.entries()]
+            .map(([company, items]) => {
+              const collapsed =
+                state.collapsed.has(company);
+
+              const subtotal = items.reduce(
+                (total, item) => total + item.mcs,
+                0
+              );
+
+              const header = `
+                <tr class="company-row">
+                  <td>
+                    <button
+                      type="button"
+                      class="company-toggle"
+                      data-company="${encodeURIComponent(company)}"
+                      aria-expanded="${!collapsed}"
+                    >
+                      <span class="chevron">
+                        ${collapsed ? "▶" : "▼"}
+                      </span>
+
+                      ${esc(company)}
+                    </button>
+                  </td>
+
+                  <td colspan="3"></td>
+
+                  <td class="num company-total">
+                    ${fmt.format(subtotal)}
+                  </td>
+                </tr>
+              `;
+
+              const detail = collapsed
+                ? ""
+                : items
+                    .map((row) => {
+                      return `
+                        <tr>
+                          <td class="child-company">↳</td>
+                          <td>${esc(row.deposit)}</td>
+                          <td>${esc(row.product)}</td>
+                          <td>${esc(row.certification)}</td>
+                          <td class="num">
+                            ${fmt.format(row.mcs)}
+                          </td>
+                        </tr>
+                      `;
+                    })
+                    .join("");
+
+              return header + detail;
+            })
+            .join("")
+        : `
+            <tr>
+              <td colspan="5" class="empty">
+                No hay registros con MCS mayor o menor que cero.
+              </td>
+            </tr>
+          `;
+
+      document
+        .querySelectorAll(".company-toggle")
+        .forEach((button) => {
+          button.addEventListener(
+            "click",
+            () => {
+              const company = decodeURIComponent(
+                button.dataset.company
+              );
+
+              if (state.collapsed.has(company)) {
+                state.collapsed.delete(company);
+              } else {
+                state.collapsed.add(company);
+              }
+
+              render();
+            }
+          );
+        });
+
+      const bdmtRows = [
+        ...state.bdmtClients
+      ].sort((a, b) => {
+        return a.client.localeCompare(
+          b.client,
+          "es"
+        );
+      });
+
+      $("bdmtRowCount").textContent =
+        `${bdmtRows.length} registro${bdmtRows.length === 1 ? "" : "s"}`;
+
+      $("bdmtTbody").innerHTML =
+        bdmtRows.length
+          ? bdmtRows
+              .map((item) => {
+                return `
+                  <tr>
+                    <td>${esc(item.client)}</td>
+
+                    <td class="num">
+                      ${fmt.format(item.bdmt)}
+                    </td>
+                  </tr>
+                `;
+              })
+              .join("")
+          : `
+              <tr>
+                <td colspan="2" class="empty">
+                  No hay existencias de BDMT para mostrar.
+                </td>
+              </tr>
+            `;
+    }
+
+    async function load() {
+      const demo = new URLSearchParams(
+        location.search
+      ).has("demo");
+
+      if (demo) {
+        $("notice").textContent =
+          "VISTA PREVIA · Datos demostrativos. El sitio publicado leerá el JSON real.";
+
+        $("notice").classList.add("show");
+        $("updated").textContent =
+          "Vista demostrativa";
+
+        configure(DEMO, {
+          total_general_bdmt: 22391.582,
+          clientes: [
+            {
+              client: "PORTUGAL GS",
+              acumulado_bdmt: 22391.603
+            }
+          ]
+        });
+
+        return;
+      }
+
+      try {
+        const response = await fetch(
+          `${JSON_URL}?_=${Date.now()}`,
+          {
+            cache: "no-store"
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(
+            `HTTP ${response.status}`
+          );
+        }
+
+        const data = await response.json();
+        const rows = extractRows(data);
+
+        if (!rows.length) {
+          throw new Error(
+            "El JSON no contiene registros"
+          );
+        }
+
+        const updated =
+          !Array.isArray(data)
+            ? value(data, aliases.updated)
+            : "";
+
+        const stockBdmt =
+          !Array.isArray(data) &&
+          data.stock_bdmt
+            ? data.stock_bdmt
+            : {};
+
+        $("updated").textContent = updated
+          ? text(updated)
+          : new Date().toLocaleString(
+              "es-UY",
+              {
+                dateStyle: "short",
+                timeStyle: "short"
+              }
+            );
+
+        configure(rows, stockBdmt);
+      } catch (error) {
+        $("updated").textContent =
+          "Sin conexión";
+
+        $("notice").innerHTML =
+          "No se pudo leer el archivo de datos. Verificá que el origen JSON esté disponible.";
+
+        $("notice").classList.add("show");
+
+        configure([], {});
+
+        console.error(error);
+      }
+    }
+
+    [
+      "search",
+      "deposit",
+      "type",
+      "company"
+    ].forEach((id) => {
+      $(id).addEventListener(
+        id === "search"
+          ? "input"
+          : "change",
+        applyFilters
+      );
+    });
+
+    $("clear").addEventListener(
+      "click",
+      () => {
+        $("search").value = "";
+        $("deposit").value = "";
+        $("type").value = "";
+        $("company").value = "";
+
+        applyFilters();
+      }
+    );
+
+    document
+      .querySelectorAll("th[data-sort]")
+      .forEach((header) => {
+        header.addEventListener(
+          "click",
+          () => {
+            const key = header.dataset.sort;
+
+            if (state.sortKey === key) {
+              state.sortDir *= -1;
+            } else {
+              state.sortKey = key;
+              state.sortDir =
+                key === "mcs"
+                  ? -1
+                  : 1;
+            }
+
+            render();
+          }
+        );
+      });
+
+    load();
   </script>
 </body>
 </html>
