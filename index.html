@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#153f2e">
-  <meta name="description" content="Consulta operativa de Stock MCS Libros por depósito, empresa y producto.">
-  <title>Stock MCS Libros</title>
+  <meta name="description" content="Consulta operativa de Stock BDMT y Troncos por depósito, empresa y producto.">
+  <title>Stock BDMT y Troncos</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23153f2e'/%3E%3Cpath d='M16 17h32v8H16zm3 13h26v7H19zm4 12h18v7H23z' fill='%23b8dc69'/%3E%3C/svg%3E">
   <style>
     :root{--forest:#153f2e;--forest-2:#226046;--lime:#b8dc69;--lime-soft:#edf7d6;--bg:#eef3f0;--card:#fff;--text:#19241e;--muted:#69766f;--border:#d9e2dc;--danger:#b33a3a;--shadow:0 12px 30px rgba(21,63,46,.09)}
@@ -32,7 +32,7 @@
 </head>
 <body>
   <header class="topbar">
-    <div class="brand"><div class="mark">M³</div><div><h1>Stock MCS Libros</h1><div class="subtitle">Existencias consolidadas por depósito y producto</div></div></div>
+    <div class="brand"><div class="mark">M³</div><div><h1>Stock BDMT y Troncos</h1><div class="subtitle">Existencias consolidadas por depósito y producto</div></div></div>
     <div class="updated">ÚLTIMA ACTUALIZACIÓN<strong id="updated">Consultando…</strong></div>
   </header>
   <main>
@@ -52,7 +52,7 @@
     <section class="grid">
       <article class="panel"><div class="panel-head"><h2>Detalle de existencias</h2><span class="count" id="rowCount">0 registros</span></div><div class="table-wrap"><table><thead><tr><th data-sort="company">Empresa</th><th data-sort="deposit">Depósito</th><th data-sort="product">Producto</th><th data-sort="certification">Certificación</th><th data-sort="mcs" class="num">MCS</th></tr></thead><tbody id="tbody"></tbody></table></div></article>
     </section>
-    <footer><span class="status"><span class="dot"></span>Datos tomados de Stock MCS Libros</span></footer>
+    <footer><span class="status"><span class="dot"></span>Datos tomados de Stock BDMT y Troncos</span></footer>
   </main>
   <script>
     const JSON_URL='https://dl.dropbox.com/scl/fi/8zqq5szdh57gtbedb8nfz/Stock-Mcs-Libros.json?rlkey=2aknnkdm9jjihs3ij6x2a40b0&dl=1';
@@ -103,7 +103,7 @@
       rows.forEach(r=>{if(!groups.has(r.company))groups.set(r.company,[]);groups.get(r.company).push(r)});
       $('tbody').innerHTML=rows.length?[...groups.entries()].map(([company,items])=>{
         const collapsed=state.collapsed.has(company),subtotal=items.reduce((s,r)=>s+r.mcs,0);
-        const head=`<tr class="company-row"><td><button type="button" class="company-toggle" data-company="${encodeURIComponent(company)}" aria-expanded="${!collapsed}"><span class="chevron">${collapsed?'▶':'▼'}</span>${esc(company)}</button></td><td colspan="3">${items.length} registro${items.length===1?'':'s'}</td><td class="num company-total">${fmt.format(subtotal)}</td></tr>`;
+        const head=`<tr class="company-row"><td><button type="button" class="company-toggle" data-company="${encodeURIComponent(company)}" aria-expanded="${!collapsed}"><span class="chevron">${collapsed?'▶':'▼'}</span>${esc(company)}</button></td><td colspan="3"></td><td class="num company-total">${fmt.format(subtotal)}</td></tr>`;
         const detail=collapsed?'':items.map(r=>`<tr><td class="child-company">↳</td><td>${esc(r.deposit)}</td><td>${esc(r.product)}</td><td>${esc(r.certification)}</td><td class="num">${fmt.format(r.mcs)}</td></tr>`).join('');
         return head+detail;
       }).join(''):'<tr><td colspan="5" class="empty">No hay registros con MCS mayor o menor que cero.</td></tr>';
