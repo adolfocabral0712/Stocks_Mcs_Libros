@@ -78,7 +78,7 @@
     const value=(row,names)=>{const map=Object.fromEntries(Object.keys(row).map(k=>[cleanKey(k),row[k]]));for(const n of names){const v=map[cleanKey(n)];if(v!==undefined&&v!==null&&v!=='')return v}return ''};
     const number=v=>{if(typeof v==='number')return Number.isFinite(v)?v:0;let s=String(v??'').trim().replace(/\s/g,'');if(!s)return 0;if(s.includes(',')&&s.includes('.'))s=s.lastIndexOf(',')>s.lastIndexOf('.')?s.replace(/\./g,'').replace(',','.'):s.replace(/,/g,'');else if(s.includes(','))s=s.replace(',','.');return Number(s)||0};
     const text=v=>String(v??'').trim();
-    const companyName=v=>cleanKey(v)==='forestal_atlantico_sur'?'FAS':text(v)||'SIN EMPRESA';
+    const companyName=v=>cleanKey(v).includes('forestal_atlantico')?'FAS':text(v)||'SIN EMPRESA';
     const normalize=row=>{const companyRaw=text(value(row,aliases.company));return{deposit:text(value(row,aliases.deposit))||'SIN DEPÓSITO',product:text(value(row,aliases.product))||'SIN PRODUCTO',certification:text(value(row,aliases.certification))||'SIN CERTIFICACIÓN',type:text(value(row,aliases.type)).toUpperCase()||'SIN CLASIFICAR',company:companyName(companyRaw),companyRaw,mcs:number(value(row,aliases.mcs)),raw:row}};
     const extractRows=data=>{if(Array.isArray(data))return data;if(!data||typeof data!=='object')return[];for(const key of ['datos','data','registros','stock','resultados','items'])if(Array.isArray(data[key]))return data[key];return Object.values(data).find(Array.isArray)||[]};
     const fmt=new Intl.NumberFormat('es-UY',{minimumFractionDigits:2,maximumFractionDigits:2});
