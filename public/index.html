@@ -4,7 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#153f2e">
-  <meta name="description" content="Consulta operativa de Stock BDMT y Troncos por depósito, empresa y producto.">
+  <meta
+    name="description"
+    content="Consulta operativa de Stock BDMT y Troncos por depósito, empresa y producto."
+  >
+
   <title>Stock BDMT y Troncos</title>
 
   <link
@@ -18,18 +22,24 @@
       --forest: #153f2e;
       --forest-2: #226046;
       --lime: #b8dc69;
-      --lime-soft: #edf7d6;
       --bg: #eef3f0;
       --card: #ffffff;
       --text: #19241e;
       --muted: #69766f;
       --border: #d9e2dc;
-      --danger: #b33a3a;
+      --warning: #9a6700;
+      --warning-bg: #fff5d6;
+      --danger: #a92f2f;
+      --danger-bg: #fff0f0;
       --shadow: 0 12px 30px rgba(21, 63, 46, .09);
     }
 
     * {
       box-sizing: border-box;
+    }
+
+    [hidden] {
+      display: none !important;
     }
 
     html {
@@ -76,7 +86,6 @@
       place-items: center;
       color: var(--forest);
       font-weight: 900;
-      letter-spacing: -1px;
     }
 
     h1 {
@@ -132,7 +141,7 @@
       display: grid;
       grid-template-columns:
         minmax(220px, 1.5fr)
-        repeat(3, minmax(150px, 1fr))
+        repeat(2, minmax(150px, 1fr))
         auto;
       gap: 12px;
       background: var(--card);
@@ -239,7 +248,6 @@
       letter-spacing: .07em;
       color: var(--muted);
       font-weight: 800;
-      text-align: center;
     }
 
     .primary .kpi-label {
@@ -251,7 +259,6 @@
       font-weight: 850;
       letter-spacing: -.04em;
       margin-top: 7px;
-      text-align: center;
     }
 
     .kpi-unit {
@@ -279,6 +286,15 @@
       overflow: hidden;
     }
 
+    .panel.pending {
+      border-color: #e3bd55;
+    }
+
+    .panel.pending .panel-head {
+      background: var(--warning-bg);
+      color: var(--warning);
+    }
+
     .panel-head {
       padding: 17px 19px;
       border-bottom: 1px solid var(--border);
@@ -303,6 +319,11 @@
       padding: 5px 9px;
       position: absolute;
       right: 19px;
+    }
+
+    .pending .count {
+      color: var(--warning);
+      background: #ffffff;
     }
 
     .table-wrap {
@@ -355,19 +376,6 @@
       color: var(--muted);
     }
 
-    .status {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-    }
-
-    .dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--lime);
-    }
-
     .company-row td {
       background: #eaf1ec;
       border-bottom-color: #d4e0d8;
@@ -417,6 +425,19 @@
       margin-top: 22px;
     }
 
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--lime);
+    }
+
     @media (max-width: 1000px) {
       .filters {
         grid-template-columns: 1fr 1fr;
@@ -445,14 +466,13 @@
         padding: 15px 10px 32px;
       }
 
-      .filters {
-        grid-template-columns: 1fr;
-        padding: 12px;
-      }
-
+      .filters,
       .kpis {
         grid-template-columns: 1fr;
-        gap: 10px;
+      }
+
+      .filters {
+        padding: 12px;
       }
 
       .kpi {
@@ -465,6 +485,7 @@
 
       .panel-head {
         padding: 14px;
+        flex-direction: column;
       }
 
       .count {
@@ -490,6 +511,7 @@
 
       <div>
         <h1>Stock BDMT y Troncos</h1>
+
         <div class="subtitle">
           Existencias consolidadas por depósito y producto
         </div>
@@ -508,6 +530,7 @@
     <section class="filters" aria-label="Filtros del stock">
       <div class="field">
         <label for="search">Buscar</label>
+
         <input
           id="search"
           type="search"
@@ -517,20 +540,15 @@
 
       <div class="field">
         <label for="deposit">Depósito</label>
+
         <select id="deposit">
           <option value="">Todos</option>
         </select>
       </div>
 
       <div class="field">
-        <label for="type">Tipo de producto</label>
-        <select id="type">
-          <option value="">Todos</option>
-        </select>
-      </div>
-
-      <div class="field">
         <label for="company">Empresa</label>
+
         <select id="company">
           <option value="">Todas</option>
         </select>
@@ -561,7 +579,9 @@
       </article>
 
       <article class="kpi primary">
-        <div class="kpi-label">Stock troncos para chipear</div>
+        <div class="kpi-label">
+          Stock troncos para chipear
+        </div>
 
         <div class="kpi-value">
           <span id="logsToChip">—</span>
@@ -571,10 +591,14 @@
     </section>
 
     <section class="grid">
+      <!-- TABLA TRADICIONAL -->
       <article class="panel">
         <div class="panel-head">
-          <h2>Detalle de existencias de MCS</h2>
-          <span class="count" id="rowCount">0 registros</span>
+          <h2>Detalle de existencias de MCS — Tradicional</h2>
+
+          <span class="count" id="traditionalRowCount">
+            0 registros
+          </span>
         </div>
 
         <div class="table-wrap">
@@ -589,15 +613,19 @@
               </tr>
             </thead>
 
-            <tbody id="tbody"></tbody>
+            <tbody id="traditionalTbody"></tbody>
           </table>
         </div>
       </article>
 
+      <!-- TABLA BDMT -->
       <article class="panel">
         <div class="panel-head">
           <h2>Detalle de existencias de BDMT</h2>
-          <span class="count" id="bdmtRowCount">0 registros</span>
+
+          <span class="count" id="bdmtRowCount">
+            0 registros
+          </span>
         </div>
 
         <div class="table-wrap">
@@ -610,6 +638,64 @@
             </thead>
 
             <tbody id="bdmtTbody"></tbody>
+          </table>
+        </div>
+      </article>
+
+      <!-- TABLA NO TRADICIONAL -->
+      <article class="panel">
+        <div class="panel-head">
+          <h2>Detalle de existencias de MCS — No tradicional</h2>
+
+          <span class="count" id="nonTraditionalRowCount">
+            0 registros
+          </span>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th data-sort="company">Empresa</th>
+                <th data-sort="deposit">Depósito</th>
+                <th data-sort="product">Producto</th>
+                <th data-sort="certification">Certificación</th>
+                <th data-sort="mcs" class="num">MCS</th>
+              </tr>
+            </thead>
+
+            <tbody id="nonTraditionalTbody"></tbody>
+          </table>
+        </div>
+      </article>
+
+      <!-- TABLA PENDIENTE -->
+      <article
+        class="panel pending"
+        id="pendingPanel"
+        hidden
+      >
+        <div class="panel-head">
+          <h2>Pendiente de clasificar</h2>
+
+          <span class="count" id="pendingRowCount">
+            0 registros
+          </span>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th data-sort="company">Empresa</th>
+                <th data-sort="deposit">Depósito</th>
+                <th data-sort="product">Producto</th>
+                <th data-sort="certification">Certificación</th>
+                <th data-sort="mcs" class="num">MCS</th>
+              </tr>
+            </thead>
+
+            <tbody id="pendingTbody"></tbody>
           </table>
         </div>
       </article>
@@ -645,11 +731,27 @@
       },
       {
         deposito: "FRIMOSA",
+        producto: "DUNNII 5,80",
+        certificacion: "FSC Mixto",
+        tipo: "NO TRADICIONAL",
+        empresa: "FORESTAL ATLANTICO SUR",
+        mcs: 19.22
+      },
+      {
+        deposito: "FRIMOSA",
         producto: "Colorado 7,20",
         certificacion: "Controlado FSC",
         tipo: "NO TRADICIONAL",
         empresa: "FORESUR",
         mcs: 846.35
+      },
+      {
+        deposito: "FRIMOSA",
+        producto: "Producto nuevo",
+        certificacion: "FSC Mixto",
+        tipo: "SIN CLASIFICAR",
+        empresa: "FORESTAL ATLANTICO SUR",
+        mcs: 125.50
       }
     ];
 
@@ -660,6 +762,7 @@
         "nombre_deposito",
         "nombredeposito"
       ],
+
       product: [
         "producto",
         "nombre_producto",
@@ -667,6 +770,7 @@
         "nombreprod",
         "descripcion_producto"
       ],
+
       type: [
         "tipo",
         "tipo_producto",
@@ -675,6 +779,7 @@
         "clasificación",
         "tradicional"
       ],
+
       company: [
         "empresa",
         "nombre_empresa",
@@ -682,12 +787,14 @@
         "razon_social",
         "razón_social"
       ],
+
       certification: [
         "certificacion",
         "certificación",
         "nombre_certificacion",
         "nombre_certificación"
       ],
+
       mcs: [
         "acumulado_metros_cubicos",
         "mcs",
@@ -699,6 +806,7 @@
         "total_mcs",
         "acumulado_mcs"
       ],
+
       updated: [
         "actualizado",
         "ultima_actualizacion",
@@ -714,7 +822,12 @@
       bdmtClients: [],
       sortKey: "company",
       sortDir: 1,
-      collapsed: new Set()
+
+      collapsed: {
+        traditional: new Set(),
+        nonTraditional: new Set(),
+        pending: new Set()
+      }
     };
 
     const $ = (id) => document.getElementById(id);
@@ -753,35 +866,65 @@
 
     const number = (value) => {
       if (typeof value === "number") {
-        return Number.isFinite(value) ? value : 0;
+        return Number.isFinite(value)
+          ? value
+          : 0;
       }
 
-      let text = String(value ?? "")
+      let result = String(value ?? "")
         .trim()
         .replace(/\s/g, "");
 
-      if (!text) {
+      if (!result) {
         return 0;
       }
 
-      if (text.includes(",") && text.includes(".")) {
-        text =
-          text.lastIndexOf(",") > text.lastIndexOf(".")
-            ? text.replace(/\./g, "").replace(",", ".")
-            : text.replace(/,/g, "");
-      } else if (text.includes(",")) {
-        text = text.replace(",", ".");
+      if (
+        result.includes(",") &&
+        result.includes(".")
+      ) {
+        result =
+          result.lastIndexOf(",") >
+          result.lastIndexOf(".")
+            ? result
+                .replace(/\./g, "")
+                .replace(",", ".")
+            : result.replace(/,/g, "");
+      } else if (result.includes(",")) {
+        result = result.replace(",", ".");
       }
 
-      return Number(text) || 0;
+      return Number(result) || 0;
     };
 
-    const text = (value) => String(value ?? "").trim();
+    const text = (value) => {
+      return String(value ?? "").trim();
+    };
 
     const companyName = (value) => {
-      return cleanKey(value).includes("forestal_atlantico")
+      return cleanKey(value).includes(
+        "forestal_atlantico"
+      )
         ? "FAS"
         : text(value) || "SIN EMPRESA";
+    };
+
+    /*
+      Respaldo para DUNNII 5,80.
+      Aunque PostgreSQL ya debería enviarlo como
+      TRADICIONAL, el HTML también lo controla.
+    */
+    const productType = (product, type) => {
+      if (
+        cleanKey(product) === "dunnii_5_80"
+      ) {
+        return "TRADICIONAL";
+      }
+
+      return (
+        text(type).toUpperCase() ||
+        "SIN CLASIFICAR"
+      );
     };
 
     const normalize = (row) => {
@@ -789,22 +932,29 @@
         value(row, aliases.company)
       );
 
+      const product =
+        text(value(row, aliases.product)) ||
+        "SIN PRODUCTO";
+
       return {
         deposit:
           text(value(row, aliases.deposit)) ||
           "SIN DEPÓSITO",
 
-        product:
-          text(value(row, aliases.product)) ||
-          "SIN PRODUCTO",
+        product,
 
         certification:
-          text(value(row, aliases.certification)) ||
-          "SIN CERTIFICACIÓN",
+          text(
+            value(
+              row,
+              aliases.certification
+            )
+          ) || "SIN CERTIFICACIÓN",
 
-        type:
-          text(value(row, aliases.type)).toUpperCase() ||
-          "SIN CLASIFICAR",
+        type: productType(
+          product,
+          value(row, aliases.type)
+        ),
 
         company: companyName(companyRaw),
         companyRaw,
@@ -822,7 +972,10 @@
         return data;
       }
 
-      if (!data || typeof data !== "object") {
+      if (
+        !data ||
+        typeof data !== "object"
+      ) {
         return [];
       }
 
@@ -841,13 +994,20 @@
         }
       }
 
-      return Object.values(data).find(Array.isArray) || [];
+      return (
+        Object.values(data).find(
+          Array.isArray
+        ) || []
+      );
     };
 
-    const fmt = new Intl.NumberFormat("es-UY", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    });
+    const fmt = new Intl.NumberFormat(
+      "es-UY",
+      {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }
+    );
 
     const esc = (value) => {
       return String(value).replace(
@@ -857,8 +1017,26 @@
           "<": "&lt;",
           ">": "&gt;",
           "'": "&#39;",
-          "\"": "&quot;"
+          '"': "&quot;"
         })[character]
+      );
+    };
+
+    const isTraditional = (type) => {
+      return cleanKey(type) === "tradicional";
+    };
+
+    const isNonTraditional = (type) => {
+      return (
+        cleanKey(type) ===
+        "no_tradicional"
+      );
+    };
+
+    const isPending = (type) => {
+      return (
+        !isTraditional(type) &&
+        !isNonTraditional(type)
       );
     };
 
@@ -875,7 +1053,9 @@
         ...new Set(values)
       ]
         .filter(Boolean)
-        .sort((a, b) => a.localeCompare(b, "es"))
+        .sort((a, b) => {
+          return a.localeCompare(b, "es");
+        })
         .map((item) => {
           return `
             <option value="${esc(item)}">
@@ -886,14 +1066,19 @@
         .join("");
 
       element.innerHTML = `
-        <option value="">${firstOption}</option>
+        <option value="">
+          ${firstOption}
+        </option>
         ${options}
       `;
 
       element.value = current;
     }
 
-    function configure(rows, stockBdmt = {}) {
+    function configure(
+      rows,
+      stockBdmt = {}
+    ) {
       state.bdmt = number(
         stockBdmt.total_general_bdmt
       );
@@ -918,47 +1103,49 @@
                   ])
                 )
               }))
-              .filter((item) => item.bdmt !== 0)
+              .filter((item) => {
+                return item.bdmt !== 0;
+              })
           : [];
 
       state.rows = rows
         .map(normalize)
-        .filter((row) => row.mcs !== 0);
+        .filter((row) => {
+          return row.mcs !== 0;
+        });
 
       fillSelect(
         "deposit",
-        state.rows.map((row) => row.deposit)
-      );
-
-      fillSelect(
-        "type",
-        state.rows.map((row) => row.type)
+        state.rows.map(
+          (row) => row.deposit
+        )
       );
 
       fillSelect(
         "company",
-        state.rows.map((row) => row.company)
+        state.rows.map(
+          (row) => row.company
+        )
       );
 
       if (
         [...$("deposit").options].some(
-          (option) => option.value === "FRIMOSA"
+          (option) => {
+            return (
+              option.value === "FRIMOSA"
+            );
+          }
         )
       ) {
-        $("deposit").value = "FRIMOSA";
-      }
-
-      if (
-        [...$("type").options].some(
-          (option) => option.value === "TRADICIONAL"
-        )
-      ) {
-        $("type").value = "TRADICIONAL";
+        $("deposit").value =
+          "FRIMOSA";
       }
 
       if (
         [...$("company").options].some(
-          (option) => option.value === "FAS"
+          (option) => {
+            return option.value === "FAS";
+          }
         )
       ) {
         $("company").value = "FAS";
@@ -972,36 +1159,51 @@
         $("search").value
       );
 
-      const deposit = $("deposit").value;
-      const type = $("type").value;
-      const company = $("company").value;
+      const deposit =
+        $("deposit").value;
 
-      state.filtered = state.rows.filter((row) => {
-        const searchContent = cleanKey(`
-          ${row.deposit}
-          ${row.product}
-          ${row.certification}
-          ${row.type}
-          ${row.company}
-          ${row.companyRaw}
-        `);
+      const company =
+        $("company").value;
 
-        return (
-          (!search || searchContent.includes(search)) &&
-          (!deposit || row.deposit === deposit) &&
-          (!type || row.type === type) &&
-          (!company || row.company === company)
-        );
-      });
+      state.filtered =
+        state.rows.filter((row) => {
+          const searchContent =
+            cleanKey(`
+              ${row.deposit}
+              ${row.product}
+              ${row.certification}
+              ${row.type}
+              ${row.company}
+              ${row.companyRaw}
+            `);
+
+          return (
+            (
+              !search ||
+              searchContent.includes(search)
+            ) &&
+            (
+              !deposit ||
+              row.deposit === deposit
+            ) &&
+            (
+              !company ||
+              row.company === company
+            )
+          );
+        });
 
       render();
     }
 
-    function render() {
-      const rows = [...state.filtered].sort(
-        (a, b) => {
-          const first = a[state.sortKey];
-          const second = b[state.sortKey];
+    function sortRows(rows) {
+      return [...rows].sort(
+        (firstRow, secondRow) => {
+          const first =
+            firstRow[state.sortKey];
+
+          const second =
+            secondRow[state.sortKey];
 
           const comparison =
             typeof first === "number"
@@ -1011,143 +1213,187 @@
                   "es"
                 );
 
-          return comparison * state.sortDir;
+          return (
+            comparison *
+            state.sortDir
+          );
         }
       );
+    }
 
-      const isNonTraditional = (type) => {
-        return cleanKey(type).includes(
-          "no_tradicional"
-        );
-      };
+    function renderGroupedTable({
+      rows,
+      tbodyId,
+      countId,
+      tableKey,
+      emptyMessage
+    }) {
+      const sortedRows =
+        sortRows(rows);
 
-      const traditionalStock = rows
-        .filter((row) => {
-          return (
-            !isNonTraditional(row.type) &&
-            cleanKey(row.type).includes(
-              "tradicional"
-            )
-          );
-        })
-        .reduce(
-          (total, row) => total + row.mcs,
-          0
-        );
-
-      const logsToChip =
-        traditionalStock -
-        state.bdmt / 0.58;
-
-      $("traditional").textContent =
-        fmt.format(traditionalStock);
-
-      $("bdmtStock").textContent =
-        fmt.format(state.bdmt);
-
-      $("logsToChip").textContent =
-        fmt.format(logsToChip);
-
-      $("rowCount").textContent =
-        `${rows.length} registro${rows.length === 1 ? "" : "s"}`;
+      $(countId).textContent =
+        `${sortedRows.length} registro${
+          sortedRows.length === 1
+            ? ""
+            : "s"
+        }`;
 
       const groups = new Map();
 
-      rows.forEach((row) => {
+      sortedRows.forEach((row) => {
         if (!groups.has(row.company)) {
-          groups.set(row.company, []);
+          groups.set(
+            row.company,
+            []
+          );
         }
 
-        groups.get(row.company).push(row);
+        groups
+          .get(row.company)
+          .push(row);
       });
 
-      $("tbody").innerHTML = rows.length
-        ? [...groups.entries()]
-            .map(([company, items]) => {
-              const collapsed =
-                state.collapsed.has(company);
+      $(tbodyId).innerHTML =
+        sortedRows.length
+          ? [...groups.entries()]
+              .map(
+                ([company, items]) => {
+                  const collapsed =
+                    state.collapsed[
+                      tableKey
+                    ].has(company);
 
-              const subtotal = items.reduce(
-                (total, item) => total + item.mcs,
-                0
-              );
+                  const subtotal =
+                    items.reduce(
+                      (total, item) => {
+                        return (
+                          total +
+                          item.mcs
+                        );
+                      },
+                      0
+                    );
 
-              const header = `
-                <tr class="company-row">
-                  <td>
-                    <button
-                      type="button"
-                      class="company-toggle"
-                      data-company="${encodeURIComponent(company)}"
-                      aria-expanded="${!collapsed}"
-                    >
-                      <span class="chevron">
-                        ${collapsed ? "▶" : "▼"}
-                      </span>
+                  const header = `
+                    <tr class="company-row">
+                      <td>
+                        <button
+                          type="button"
+                          class="company-toggle"
+                          data-table="${tableKey}"
+                          data-company="${encodeURIComponent(company)}"
+                          aria-expanded="${!collapsed}"
+                        >
+                          <span class="chevron">
+                            ${collapsed ? "▶" : "▼"}
+                          </span>
 
-                      ${esc(company)}
-                    </button>
-                  </td>
+                          ${esc(company)}
+                        </button>
+                      </td>
 
-                  <td colspan="3"></td>
+                      <td colspan="3"></td>
 
-                  <td class="num company-total">
-                    ${fmt.format(subtotal)}
-                  </td>
-                </tr>
-              `;
+                      <td class="num company-total">
+                        ${fmt.format(subtotal)}
+                      </td>
+                    </tr>
+                  `;
 
-              const detail = collapsed
-                ? ""
-                : items
-                    .map((row) => {
-                      return `
-                        <tr>
-                          <td class="child-company">↳</td>
-                          <td>${esc(row.deposit)}</td>
-                          <td>${esc(row.product)}</td>
-                          <td>${esc(row.certification)}</td>
-                          <td class="num">
-                            ${fmt.format(row.mcs)}
-                          </td>
-                        </tr>
-                      `;
-                    })
-                    .join("");
+                  const detail =
+                    collapsed
+                      ? ""
+                      : items
+                          .map((row) => {
+                            return `
+                              <tr>
+                                <td class="child-company">
+                                  ↳
+                                </td>
 
-              return header + detail;
-            })
-            .join("")
-        : `
-            <tr>
-              <td colspan="5" class="empty">
-                No hay registros con MCS mayor o menor que cero.
-              </td>
-            </tr>
-          `;
+                                <td>
+                                  ${esc(row.deposit)}
+                                </td>
 
+                                <td>
+                                  ${esc(row.product)}
+                                </td>
+
+                                <td>
+                                  ${esc(row.certification)}
+                                </td>
+
+                                <td class="num">
+                                  ${fmt.format(row.mcs)}
+                                </td>
+                              </tr>
+                            `;
+                          })
+                          .join("");
+
+                  return (
+                    header +
+                    detail
+                  );
+                }
+              )
+              .join("")
+          : `
+              <tr>
+                <td
+                  colspan="5"
+                  class="empty"
+                >
+                  ${emptyMessage}
+                </td>
+              </tr>
+            `;
+    }
+
+    function activateCompanyButtons() {
       document
-        .querySelectorAll(".company-toggle")
+        .querySelectorAll(
+          ".company-toggle"
+        )
         .forEach((button) => {
           button.addEventListener(
             "click",
             () => {
-              const company = decodeURIComponent(
-                button.dataset.company
-              );
+              const tableKey =
+                button.dataset.table;
 
-              if (state.collapsed.has(company)) {
-                state.collapsed.delete(company);
+              const company =
+                decodeURIComponent(
+                  button.dataset.company
+                );
+
+              const collapsedSet =
+                state.collapsed[
+                  tableKey
+                ];
+
+              if (
+                collapsedSet.has(
+                  company
+                )
+              ) {
+                collapsedSet.delete(
+                  company
+                );
               } else {
-                state.collapsed.add(company);
+                collapsedSet.add(
+                  company
+                );
               }
 
               render();
             }
           );
         });
+    }
 
-      const bdmtRows = [
+    function renderBdmt() {
+      const rows = [
         ...state.bdmtClients
       ].sort((a, b) => {
         return a.client.localeCompare(
@@ -1157,15 +1403,21 @@
       });
 
       $("bdmtRowCount").textContent =
-        `${bdmtRows.length} registro${bdmtRows.length === 1 ? "" : "s"}`;
+        `${rows.length} registro${
+          rows.length === 1
+            ? ""
+            : "s"
+        }`;
 
       $("bdmtTbody").innerHTML =
-        bdmtRows.length
-          ? bdmtRows
+        rows.length
+          ? rows
               .map((item) => {
                 return `
                   <tr>
-                    <td>${esc(item.client)}</td>
+                    <td>
+                      ${esc(item.client)}
+                    </td>
 
                     <td class="num">
                       ${fmt.format(item.bdmt)}
@@ -1176,46 +1428,159 @@
               .join("")
           : `
               <tr>
-                <td colspan="2" class="empty">
+                <td
+                  colspan="2"
+                  class="empty"
+                >
                   No hay existencias de BDMT para mostrar.
                 </td>
               </tr>
             `;
     }
 
+    function render() {
+      const traditionalRows =
+        state.filtered.filter(
+          (row) => {
+            return isTraditional(
+              row.type
+            );
+          }
+        );
+
+      const nonTraditionalRows =
+        state.filtered.filter(
+          (row) => {
+            return isNonTraditional(
+              row.type
+            );
+          }
+        );
+
+      const pendingRows =
+        state.filtered.filter(
+          (row) => {
+            return isPending(
+              row.type
+            );
+          }
+        );
+
+      const traditionalStock =
+        traditionalRows.reduce(
+          (total, row) => {
+            return total + row.mcs;
+          },
+          0
+        );
+
+      const logsToChip =
+        traditionalStock -
+        state.bdmt / 0.58;
+
+      $("traditional").textContent =
+        fmt.format(
+          traditionalStock
+        );
+
+      $("bdmtStock").textContent =
+        fmt.format(state.bdmt);
+
+      $("logsToChip").textContent =
+        fmt.format(logsToChip);
+
+      renderGroupedTable({
+        rows: traditionalRows,
+        tbodyId:
+          "traditionalTbody",
+        countId:
+          "traditionalRowCount",
+        tableKey:
+          "traditional",
+        emptyMessage:
+          "No hay existencias tradicionales para mostrar."
+      });
+
+      renderBdmt();
+
+      renderGroupedTable({
+        rows: nonTraditionalRows,
+        tbodyId:
+          "nonTraditionalTbody",
+        countId:
+          "nonTraditionalRowCount",
+        tableKey:
+          "nonTraditional",
+        emptyMessage:
+          "No hay existencias no tradicionales para mostrar."
+      });
+
+      $("pendingPanel").hidden =
+        pendingRows.length === 0;
+
+      if (pendingRows.length) {
+        renderGroupedTable({
+          rows: pendingRows,
+          tbodyId:
+            "pendingTbody",
+          countId:
+            "pendingRowCount",
+          tableKey:
+            "pending",
+          emptyMessage:
+            "No hay productos pendientes de clasificar."
+        });
+      }
+
+      activateCompanyButtons();
+    }
+
     async function load() {
-      const demo = new URLSearchParams(
-        location.search
-      ).has("demo");
+      const demo =
+        new URLSearchParams(
+          location.search
+        ).has("demo");
 
       if (demo) {
         $("notice").textContent =
           "VISTA PREVIA · Datos demostrativos. El sitio publicado leerá el JSON real.";
 
-        $("notice").classList.add("show");
+        $("notice")
+          .classList
+          .add("show");
+
         $("updated").textContent =
           "Vista demostrativa";
 
-        configure(DEMO, {
-          total_general_bdmt: 22391.582,
-          clientes: [
-            {
-              client: "PORTUGAL GS",
-              acumulado_bdmt: 22391.603
-            }
-          ]
-        });
+        configure(
+          DEMO,
+          {
+            total_general_bdmt:
+              22391.582,
+
+            clientes: [
+              {
+                client:
+                  "PORTUGAL GS",
+
+                acumulado_bdmt:
+                  22391.603
+              }
+            ]
+          }
+        );
 
         return;
       }
 
       try {
-        const response = await fetch(
-          `${JSON_URL}?_=${Date.now()}`,
-          {
-            cache: "no-store"
-          }
-        );
+        const response =
+          await fetch(
+            `${JSON_URL}?_=${Date.now()}`,
+            {
+              cache: "no-store"
+            }
+          );
 
         if (!response.ok) {
           throw new Error(
@@ -1223,8 +1588,11 @@
           );
         }
 
-        const data = await response.json();
-        const rows = extractRows(data);
+        const data =
+          await response.json();
+
+        const rows =
+          extractRows(data);
 
         if (!rows.length) {
           throw new Error(
@@ -1234,7 +1602,10 @@
 
         const updated =
           !Array.isArray(data)
-            ? value(data, aliases.updated)
+            ? value(
+                data,
+                aliases.updated
+              )
             : "";
 
         const stockBdmt =
@@ -1243,17 +1614,25 @@
             ? data.stock_bdmt
             : {};
 
-        $("updated").textContent = updated
-          ? text(updated)
-          : new Date().toLocaleString(
-              "es-UY",
-              {
-                dateStyle: "short",
-                timeStyle: "short"
-              }
-            );
+        $("updated").textContent =
+          updated
+            ? text(updated)
+            : new Date()
+                .toLocaleString(
+                  "es-UY",
+                  {
+                    dateStyle:
+                      "short",
 
-        configure(rows, stockBdmt);
+                    timeStyle:
+                      "short"
+                  }
+                );
+
+        configure(
+          rows,
+          stockBdmt
+        );
       } catch (error) {
         $("updated").textContent =
           "Sin conexión";
@@ -1261,7 +1640,9 @@
         $("notice").innerHTML =
           "No se pudo leer el archivo de datos. Verificá que el origen JSON esté disponible.";
 
-        $("notice").classList.add("show");
+        $("notice")
+          .classList
+          .add("show");
 
         configure([], {});
 
@@ -1272,13 +1653,13 @@
     [
       "search",
       "deposit",
-      "type",
       "company"
     ].forEach((id) => {
       $(id).addEventListener(
         id === "search"
           ? "input"
           : "change",
+
         applyFilters
       );
     });
@@ -1288,7 +1669,6 @@
       () => {
         $("search").value = "";
         $("deposit").value = "";
-        $("type").value = "";
         $("company").value = "";
 
         applyFilters();
@@ -1296,17 +1676,23 @@
     );
 
     document
-      .querySelectorAll("th[data-sort]")
+      .querySelectorAll(
+        "th[data-sort]"
+      )
       .forEach((header) => {
         header.addEventListener(
           "click",
           () => {
-            const key = header.dataset.sort;
+            const key =
+              header.dataset.sort;
 
-            if (state.sortKey === key) {
+            if (
+              state.sortKey === key
+            ) {
               state.sortDir *= -1;
             } else {
               state.sortKey = key;
+
               state.sortDir =
                 key === "mcs"
                   ? -1
