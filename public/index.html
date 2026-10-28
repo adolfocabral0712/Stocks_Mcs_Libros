@@ -141,7 +141,7 @@
       display: grid;
       grid-template-columns:
         minmax(220px, 1.5fr)
-        repeat(2, minmax(150px, 1fr))
+        repeat(3, minmax(150px, 1fr))
         auto;
       gap: 12px;
       background: var(--card);
@@ -182,6 +182,13 @@
     }
 
     .field input::placeholder {
+      text-align: center;
+    }
+
+    .field small {
+      color: var(--muted);
+      font-size: .7rem;
+      line-height: 1.2;
       text-align: center;
     }
 
@@ -554,6 +561,20 @@
         </select>
       </div>
 
+      <div class="field">
+        <label for="cutoffDate">Fecha de corte</label>
+
+        <input
+          id="cutoffDate"
+          type="date"
+          aria-describedby="cutoffHelp"
+        >
+
+        <small id="cutoffHelp">
+          Incluye movimientos MCS y BDMT hasta ese día
+        </small>
+      </div>
+
       <button class="clear" id="clear" type="button">
         Limpiar filtros
       </button>
@@ -719,7 +740,8 @@
         certificacion: "FSC Mixto",
         tipo: "TRADICIONAL",
         empresa: "FORESTAL ATLANTICO SUR",
-        mcs: 1284.72
+        mcs: 1284.72,
+        fecha: "2026-10-24"
       },
       {
         deposito: "FRIMOSA",
@@ -727,7 +749,8 @@
         certificacion: "Controlado FSC",
         tipo: "TRADICIONAL",
         empresa: "FORESTAL ATLANTICO SUR",
-        mcs: 953.40
+        mcs: 953.40,
+        fecha: "2026-10-25"
       },
       {
         deposito: "FRIMOSA",
@@ -735,7 +758,8 @@
         certificacion: "FSC Mixto",
         tipo: "NO TRADICIONAL",
         empresa: "FORESTAL ATLANTICO SUR",
-        mcs: 19.22
+        mcs: 19.22,
+        fecha: "2026-10-25"
       },
       {
         deposito: "FRIMOSA",
@@ -743,7 +767,8 @@
         certificacion: "Controlado FSC",
         tipo: "NO TRADICIONAL",
         empresa: "FORESUR",
-        mcs: 846.35
+        mcs: 846.35,
+        fecha: "2026-10-26"
       },
       {
         deposito: "FRIMOSA",
@@ -751,7 +776,8 @@
         certificacion: "FSC Mixto",
         tipo: "SIN CLASIFICAR",
         empresa: "FORESTAL ATLANTICO SUR",
-        mcs: 125.50
+        mcs: 125.50,
+        fecha: "2026-10-25"
       }
     ];
 
@@ -807,6 +833,12 @@
         "acumulado_mcs"
       ],
 
+      date: [
+        "fecha",
+        "fecha_movimiento",
+        "fecharto"
+      ],
+
       updated: [
         "actualizado",
         "ultima_actualizacion",
@@ -820,6 +852,9 @@
       filtered: [],
       bdmt: 0,
       bdmtClients: [],
+      bdmtMovements: [],
+      minDate: "",
+      maxDate: "",
       sortKey: "company",
       sortDir: 1,
 
@@ -901,6 +936,14 @@
       return String(value ?? "").trim();
     };
 
+    const normalizedDate = (value) => {
+      const result = text(value).slice(0, 10);
+
+      return /^\d{4}-\d{2}-\d{2}$/.test(result)
+        ? result
+        : "";
+    };
+
     const companyName = (value) => {
       return cleanKey(value).includes(
         "forestal_atlantico"
@@ -961,6 +1004,10 @@
 
         mcs: number(
           value(row, aliases.mcs)
+        ),
+
+        date: normalizedDate(
+          value(row, aliases.date)
         ),
 
         raw: row
@@ -1077,7 +1124,8 @@
 
     function configure(
       rows,
-      stockBdmt = {}
+      stockBdmt = {},
+      dateLimits = {}
     ) {
       state.bdmt = number(
         stockBdmt.total_general_bdmt
@@ -1108,11 +1156,58 @@
               })
           : [];
 
+      state.bdmtMovements =
+        Array.isArray(stockBdmt.movimientos)
+          ? stockBdmt.movimientos
+              .map((item) => ({
+                date: normalizedDate(
+                  value(item, [
+                    "fecha",
+                    "date"
+                  ])
+                ),
+
+                client:
+                  text(
+                    value(item, [
+                      "client",
+                      "cliente"
+                    ])
+                  ) || "SIN CLIENTE",
+
+                bdmt: number(
+                  value(item, [
+                    "bdmt",
+                    "acumulado_bdmt"
+                  ])
+                )
+              }))
+              .filter((item) => {
+                return item.date;
+              })
+          : [];
+
       state.rows = rows
         .map(normalize)
         .filter((row) => {
           return row.mcs !== 0;
         });
+
+      const availableDates = [
+        ...state.rows.map((row) => row.date),
+        ...state.bdmtMovements.map((item) => item.date),
+        normalizedDate(dateLimits.min),
+        normalizedDate(dateLimits.max)
+      ]
+        .filter(Boolean)
+        .sort();
+
+      state.minDate = availableDates[0] || "";
+      state.maxDate = availableDates.at(-1) || "";
+
+      $("cutoffDate").min = state.minDate;
+      $("cutoffDate").max = state.maxDate;
+      $("cutoffDate").value = state.maxDate;
 
       fillSelect(
         "deposit",
@@ -1165,6 +1260,9 @@
       const company =
         $("company").value;
 
+      const cutoffDate =
+        $("cutoffDate").value;
+
       state.filtered =
         state.rows.filter((row) => {
           const searchContent =
@@ -1189,6 +1287,13 @@
             (
               !company ||
               row.company === company
+            ) &&
+            (
+              !cutoffDate ||
+              (
+                row.date &&
+                row.date <= cutoffDate
+              )
             )
           );
         });
@@ -1438,7 +1543,54 @@
             `;
     }
 
+    function calculateBdmtAtCutoff() {
+      if (!state.bdmtMovements.length) {
+        return;
+      }
+
+      const cutoffDate =
+        $("cutoffDate").value;
+
+      const totalsByClient = new Map();
+
+      state.bdmtMovements
+        .filter((item) => {
+          return (
+            !cutoffDate ||
+            item.date <= cutoffDate
+          );
+        })
+        .forEach((item) => {
+          totalsByClient.set(
+            item.client,
+            (
+              totalsByClient.get(item.client) || 0
+            ) + item.bdmt
+          );
+        });
+
+      state.bdmt = [
+        ...totalsByClient.values()
+      ].reduce(
+        (total, amount) => total + amount,
+        0
+      );
+
+      state.bdmtClients = [
+        ...totalsByClient.entries()
+      ]
+        .map(([client, bdmt]) => ({
+          client,
+          bdmt
+        }))
+        .filter((item) => {
+          return item.bdmt > 1;
+        });
+    }
+
     function render() {
+      calculateBdmtAtCutoff();
+
       const traditionalRows =
         state.filtered.filter(
           (row) => {
@@ -1566,7 +1718,24 @@
                 acumulado_bdmt:
                   22391.603
               }
+            ],
+
+            movimientos: [
+              {
+                fecha: "2026-10-24",
+                client: "PORTUGAL GS",
+                bdmt: 22000.000
+              },
+              {
+                fecha: "2026-10-25",
+                client: "PORTUGAL GS",
+                bdmt: 391.603
+              }
             ]
+          },
+          {
+            min: "2026-10-24",
+            max: "2026-10-26"
           }
         );
 
@@ -1631,7 +1800,11 @@
 
         configure(
           rows,
-          stockBdmt
+          stockBdmt,
+          {
+            min: data.fecha_minima_mcs,
+            max: data.fecha_maxima_mcs
+          }
         );
       } catch (error) {
         $("updated").textContent =
@@ -1644,7 +1817,7 @@
           .classList
           .add("show");
 
-        configure([], {});
+        configure([], {}, {});
 
         console.error(error);
       }
@@ -1653,7 +1826,8 @@
     [
       "search",
       "deposit",
-      "company"
+      "company",
+      "cutoffDate"
     ].forEach((id) => {
       $(id).addEventListener(
         id === "search"
@@ -1670,6 +1844,7 @@
         $("search").value = "";
         $("deposit").value = "";
         $("company").value = "";
+        $("cutoffDate").value = state.maxDate;
 
         applyFilters();
       }
