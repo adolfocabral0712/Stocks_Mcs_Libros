@@ -216,7 +216,7 @@
 
     .kpis {
       display: grid;
-      grid-template-columns: repeat(3, minmax(240px, 1fr));
+      grid-template-columns: repeat(4, minmax(220px, 1fr));
       gap: 14px;
       margin-bottom: 18px;
     }
@@ -586,6 +586,15 @@
 
         <div class="kpi-value">
           <span id="traditional">—</span>
+          <span class="kpi-unit">MCS</span>
+        </div>
+      </article>
+
+      <article class="kpi">
+        <div class="kpi-label">Stock no tradicional</div>
+
+        <div class="kpi-value">
+          <span id="nonTraditional">—</span>
           <span class="kpi-unit">MCS</span>
         </div>
       </article>
@@ -1326,6 +1335,39 @@
       );
     }
 
+    function summarizeStockRows(rows) {
+      const totals = new Map();
+
+      rows.forEach((row) => {
+        const key = JSON.stringify([
+          row.company,
+          row.deposit,
+          row.product,
+          row.certification,
+          row.type
+        ]);
+
+        if (!totals.has(key)) {
+          totals.set(key, {
+            ...row,
+            mcs: 0,
+            date: ""
+          });
+        }
+
+        totals.get(key).mcs += row.mcs;
+      });
+
+      return [...totals.values()]
+        .map((row) => ({
+          ...row,
+          mcs: Math.round(
+            (row.mcs + Number.EPSILON) * 100
+          ) / 100
+        }))
+        .filter((row) => row.mcs !== 0);
+    }
+
     function renderGroupedTable({
       rows,
       tbodyId,
@@ -1591,8 +1633,13 @@
     function render() {
       calculateBdmtAtCutoff();
 
+      const summarizedRows =
+        summarizeStockRows(
+          state.filtered
+        );
+
       const traditionalRows =
-        state.filtered.filter(
+        summarizedRows.filter(
           (row) => {
             return isTraditional(
               row.type
@@ -1601,7 +1648,7 @@
         );
 
       const nonTraditionalRows =
-        state.filtered.filter(
+        summarizedRows.filter(
           (row) => {
             return isNonTraditional(
               row.type
@@ -1610,7 +1657,7 @@
         );
 
       const pendingRows =
-        state.filtered.filter(
+        summarizedRows.filter(
           (row) => {
             return isPending(
               row.type
@@ -1626,6 +1673,14 @@
           0
         );
 
+      const nonTraditionalStock =
+        nonTraditionalRows.reduce(
+          (total, row) => {
+            return total + row.mcs;
+          },
+          0
+        );
+
       const logsToChip =
         traditionalStock -
         state.bdmt / 0.58;
@@ -1633,6 +1688,11 @@
       $("traditional").textContent =
         fmt.format(
           traditionalStock
+        );
+
+      $("nonTraditional").textContent =
+        fmt.format(
+          nonTraditionalStock
         );
 
       $("bdmtStock").textContent =
