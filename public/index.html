@@ -1365,7 +1365,9 @@
             (row.mcs + Number.EPSILON) * 100
           ) / 100
         }))
-        .filter((row) => row.mcs !== 0);
+        .filter((row) => {
+          return Math.abs(row.mcs) > 0.06;
+        });
     }
 
     function renderGroupedTable({
