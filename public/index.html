@@ -216,7 +216,7 @@
 
     .kpis {
       display: grid;
-      grid-template-columns: repeat(4, minmax(220px, 1fr));
+      grid-template-columns: repeat(3, minmax(240px, 1fr));
       gap: 14px;
       margin-bottom: 18px;
     }
@@ -586,15 +586,6 @@
 
         <div class="kpi-value">
           <span id="traditional">—</span>
-          <span class="kpi-unit">MCS</span>
-        </div>
-      </article>
-
-      <article class="kpi">
-        <div class="kpi-label">Stock no tradicional</div>
-
-        <div class="kpi-value">
-          <span id="nonTraditional">—</span>
           <span class="kpi-unit">MCS</span>
         </div>
       </article>
@@ -1202,6 +1193,17 @@
           return row.mcs !== 0;
         });
 
+      state.collapsed.nonTraditional =
+        new Set(
+          state.rows
+            .filter((row) => {
+              return isNonTraditional(
+                row.type
+              );
+            })
+            .map((row) => row.company)
+        );
+
       const availableDates = [
         ...state.rows.map((row) => row.date),
         ...state.bdmtMovements.map((item) => item.date),
@@ -1675,14 +1677,6 @@
           0
         );
 
-      const nonTraditionalStock =
-        nonTraditionalRows.reduce(
-          (total, row) => {
-            return total + row.mcs;
-          },
-          0
-        );
-
       const logsToChip =
         traditionalStock -
         state.bdmt / 0.58;
@@ -1690,11 +1684,6 @@
       $("traditional").textContent =
         fmt.format(
           traditionalStock
-        );
-
-      $("nonTraditional").textContent =
-        fmt.format(
-          nonTraditionalStock
         );
 
       $("bdmtStock").textContent =
