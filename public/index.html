@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#153f2e">
+  <meta name="theme-color" content="#C65312">
   <meta
     name="description"
     content="Consulta operativa de Stock BDMT y Troncos por depósito, empresa y producto."
@@ -14,24 +14,24 @@
   <link
     rel="icon"
     type="image/svg+xml"
-    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23153f2e'/%3E%3Cpath d='M16 17h32v8H16zm3 13h26v7H19zm4 12h18v7H23z' fill='%23b8dc69'/%3E%3C/svg%3E"
+    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23C65312'/%3E%3Cpath d='M16 17h32v8H16zm3 13h26v7H19zm4 12h18v7H23z' fill='%23FFFFFF'/%3E%3C/svg%3E"
   >
 
   <style>
     :root {
-      --forest: #153f2e;
-      --forest-2: #226046;
-      --lime: #b8dc69;
-      --bg: #eef3f0;
+      --forest: #C65312;
+      --forest-2: #E86F18;
+      --lime: #FFB86B;
+      --bg: #F4F3F1;
       --card: #ffffff;
-      --text: #19241e;
-      --muted: #69766f;
-      --border: #d9e2dc;
-      --warning: #9a6700;
-      --warning-bg: #fff5d6;
-      --danger: #a92f2f;
-      --danger-bg: #fff0f0;
-      --shadow: 0 12px 30px rgba(21, 63, 46, .09);
+      --text: #1F1F1F;
+      --muted: #6B6B6B;
+      --border: #DEDAD6;
+      --warning: #9A5A00;
+      --warning-bg: #FFF4E5;
+      --danger: #A83232;
+      --danger-bg: #FFF0F0;
+      --shadow: 0 12px 30px rgba(49, 38, 31, .10);
     }
 
     * {
@@ -68,7 +68,7 @@
       align-items: center;
       justify-content: space-between;
       gap: 20px;
-      box-shadow: 0 4px 20px rgba(8, 30, 20, .16);
+      box-shadow: 0 4px 20px rgba(74, 35, 12, .20);
     }
 
     .brand {
@@ -95,7 +95,7 @@
     }
 
     .subtitle {
-      color: #c8d8cf;
+      color: #FFF0E6;
       margin-top: 5px;
       font-size: .86rem;
     }
@@ -106,7 +106,7 @@
       padding: 9px 13px;
       text-align: right;
       font-size: .8rem;
-      color: #d8e4dd;
+      color: #FFE4D1;
       white-space: nowrap;
     }
 
@@ -127,9 +127,9 @@
       display: none;
       margin-bottom: 16px;
       padding: 12px 15px;
-      border: 1px solid #ead28d;
-      background: #fff9e7;
-      color: #725714;
+      border: 1px solid #F0B37B;
+      background: #FFF7EF;
+      color: #7A3A0D;
       border-radius: 12px;
     }
 
@@ -172,7 +172,7 @@
       height: 43px;
       border: 1px solid var(--border);
       border-radius: 10px;
-      background: #fbfcfb;
+      background: #FCFBFA;
       color: var(--text);
       padding: 0 12px;
       outline: none;
@@ -195,7 +195,7 @@
     .field input:focus,
     .field select:focus {
       border-color: var(--forest-2);
-      box-shadow: 0 0 0 3px rgba(34, 96, 70, .12);
+      box-shadow: 0 0 0 3px rgba(232, 111, 24, .16);
     }
 
     .clear {
@@ -203,7 +203,7 @@
       height: 43px;
       border: 0;
       border-radius: 10px;
-      background: #e7eee9;
+      background: #F0EAE5;
       color: var(--forest);
       font-weight: 800;
       padding: 0 17px;
@@ -211,7 +211,7 @@
     }
 
     .clear:hover {
-      background: #dce8e0;
+      background: #E8DED6;
     }
 
     .kpis {
@@ -243,7 +243,7 @@
       position: absolute;
       width: 105px;
       height: 105px;
-      border: 24px solid rgba(184, 220, 105, .13);
+      border: 24px solid rgba(255, 255, 255, .14);
       border-radius: 50%;
       right: -35px;
       top: -45px;
@@ -258,7 +258,7 @@
     }
 
     .primary .kpi-label {
-      color: #c9d9cf;
+      color: #FFF0E6;
     }
 
     .kpi-value {
@@ -294,7 +294,7 @@
     }
 
     .panel.pending {
-      border-color: #e3bd55;
+      border-color: #E3A451;
     }
 
     .panel.pending .panel-head {
@@ -321,7 +321,7 @@
     .count {
       font-size: .78rem;
       color: var(--muted);
-      background: #eef3f0;
+      background: #F2EFEC;
       border-radius: 999px;
       padding: 5px 9px;
       position: absolute;
@@ -349,8 +349,8 @@
       position: sticky;
       top: 0;
       z-index: 1;
-      background: #f4f7f5;
-      color: #4d5d54;
+      background: #F2EFEC;
+      color: #4B4541;
       text-align: center;
       font-size: .73rem;
       text-transform: uppercase;
@@ -362,13 +362,13 @@
 
     td {
       padding: 12px 14px;
-      border-bottom: 1px solid #edf1ee;
+      border-bottom: 1px solid #ECE8E4;
       font-size: .87rem;
       text-align: center;
     }
 
     tbody tr:hover {
-      background: #f7faf8;
+      background: #FFF8F3;
     }
 
     .num {
@@ -384,8 +384,8 @@
     }
 
     .company-row td {
-      background: #eaf1ec;
-      border-bottom-color: #d4e0d8;
+      background: #FFF0E5;
+      border-bottom-color: #F1D2BA;
       font-weight: 850;
     }
 
@@ -421,7 +421,7 @@
     }
 
     .child-company {
-      color: #8a9690;
+      color: #8A817B;
       text-align: center;
     }
 
